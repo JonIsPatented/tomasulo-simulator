@@ -1,0 +1,39 @@
+.collapsible-wrapper {
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    border-radius: 12px;
+}
+
+.collapse-trigger {
+    background-color: #f1f1f1;
+    color: #444;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    text-align: left;
+    border: none;
+    border-radius: 8px;
+    outline: none;
+    transition: background-color 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.collapse-trigger:hover {
+    background-color: #ddd;
+}
+
+.collapsible-content {
+    height: 0;
+    overflow: hidden;
+    transition: height 0.4s ease;
+}
+
+.collapsible-content.is-open {
+    height: auto;
+}
+
+.collapsible-inner {
+    padding: 18px;
+}
