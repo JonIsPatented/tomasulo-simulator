@@ -1,5 +1,5 @@
 import './CollapsibleContainer.css'
-import { useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 
 interface CollapsibleContainerProps {
     title: ReactNode,
@@ -9,11 +9,18 @@ interface CollapsibleContainerProps {
 export const CollapsibleContainer = ({ title, children }: CollapsibleContainerProps) => {
 
     const [isOpen, setIsOpen] = useState(true)
-    const contentRef = useRef(null)
+    const [contentHeight, setContentHeight] = useState(0)
+    const contentRef = useRef<HTMLDivElement>(null)
 
     const toggleCollapse = () => {
         setIsOpen(!isOpen)
     }
+
+    useEffect(() => {
+        if (contentRef.current) {
+            setContentHeight(contentRef.current.scrollHeight)
+        }
+    }, [children])
 
     return (
         <div className='collapsible-wrapper'>
@@ -22,11 +29,16 @@ export const CollapsibleContainer = ({ title, children }: CollapsibleContainerPr
                 <span>{isOpen ? 'Close' : 'Open'}</span>
             </button>
             <div
-                ref={contentRef}
-                className={`collapsible-content ${isOpen ? 'is-open' : ''}`}
+                className={'collapsible-content'}
                 aria-hidden={!isOpen}
+                style={{ height: isOpen ? `${contentHeight}px` : '0' }}
             >
-                <div className='collapsible-inner'>{children}</div>
+                <div
+                    ref={contentRef}
+                    className='collapsible-inner'
+                >
+                    {children}
+                </div>
             </div>
         </div>
     )

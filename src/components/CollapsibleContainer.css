@@ -25,13 +25,8 @@
 }
 
 .collapsible-content {
-    height: 0;
     overflow: hidden;
-    transition: height 0.4s ease;
-}
-
-.collapsible-content.is-open {
-    height: auto;
+    transition: height 0.6s ease-in-out;
 }
 
 .collapsible-inner {
