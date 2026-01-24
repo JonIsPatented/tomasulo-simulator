@@ -64,7 +64,7 @@ export class Simulation {
         this.subscribers = []
     }
 
-    public static getSimulation = () => {
+    public static readonly getSimulation = () => {
         if (Simulation.instance === null) {
             Simulation.instance = new Simulation()
         }
@@ -76,7 +76,7 @@ export class Simulation {
     // Provide the simulator with a callback to run whenever the state changes.
     // A unique string id must be provided for each subscriber, so that subscribers
     // can be unsubscribed from notifications when it is time for cleanup.
-    public subscribe = (func: (data: SimulatorData) => void, id: string): boolean => {
+    public readonly subscribe = (func: (data: SimulatorData) => void, id: string): boolean => {
         if (this.subscribers.some(subscriber => subscriber.id === id)) {
             return false
         }
@@ -86,7 +86,7 @@ export class Simulation {
 
     // Remove a subscribed callback from the simulator so that it is no longer
     // called when the state changes.
-    public unsubscribe = (id: string): boolean => {
+    public readonly unsubscribe = (id: string): boolean => {
         if (!this.subscribers.some(subscriber => subscriber.id === id)) {
             return false
         }
@@ -95,7 +95,7 @@ export class Simulation {
         return true
     }
 
-    public getSimulatorData = (): SimulatorData => {
+    public readonly getSimulatorData = (): SimulatorData => {
         return { // TODO
             registerFile: [1.2, -10.4, 8.0, -2.6],
             registerAliasTable: [null, null, 1, null],
@@ -147,11 +147,38 @@ export class Simulation {
         }
     }
 
-    private publish = () => {
+    private readonly publish = () => {
         const data = this.getSimulatorData()
         this.subscribers.forEach((subscriber) => {
             subscriber.func(data)
         })
+    }
+
+    private clockRatePerSecond: number = 1
+    private timerId: ReturnType<typeof setInterval> | null = null
+
+    public readonly startClock = () => {
+        if (this.timerId) return
+        this.timerId = setInterval(() => {
+            this.tick()
+            this.publish()
+        }, this.clockRatePerSecond * 1000)
+    }
+
+    public readonly stopClock = () => {
+        clearInterval(this.timerId ?? undefined)
+        this.timerId = null
+    }
+
+    public readonly setClockRate = (newRatePerSecond: number) => {
+        this.stopClock()
+        this.clockRatePerSecond = newRatePerSecond
+        this.startClock()
+        this.publish()
+    }
+
+    private readonly tick = () => {
+        // TODO
     }
 
 }
