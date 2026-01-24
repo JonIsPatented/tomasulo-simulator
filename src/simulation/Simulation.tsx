@@ -1,31 +1,31 @@
 interface ReservationStationData {
-    // which operation is being performed in this station
+    // Which operation is being performed in this station
     // or null if the station is empty
     operation: '+' | '-' | '*' | '/' | null
 
-    // the value of the first argument, or null if
+    // The value of the first argument, or null if
     // the argument is awaiting another station or
     // if this station is empty
     firstArgumentValue: number | null
 
-    // the number of the station the first argument
+    // The number of the station the first argument
     // is awaiting, or null if the argument is not
     // awaiting another station or if this station
     // is empty
     firstArgumentStation: number | null
 
-    // the value of the second argument, or null if
+    // The value of the second argument, or null if
     // the argument is awaiting another station or
     // if this station is empty
     secondArgumentValue: number | null
 
-    // the number of the station the first argument
+    // The number of the station the first argument
     // is awaiting, or null if the argument is not
     // awaiting another station or if this station
     // is empty
     secondArgumentStation: number | null
 
-    // whether this station is empty
+    // Whether this station is empty
     isEmpty: boolean
 }
 
@@ -33,25 +33,25 @@ interface SimulatorData {
     // Eventually, this will include a full copy
     // of the current state of the simulator
 
-    // values in the registers, sorted R0-RN
+    // Values in the registers, sorted R0-RN
     registerFile: Array<number>
 
-    // aliases in the RAT, with null meaning no alias
+    // Aliases in the RAT, with null meaning no alias
     // and a number indicating the index of the
     // corresponding reservation station
     registerAliasTable: Array<number | null>
 
-    // values in the reservation stations, sorted
+    // Values in the reservation stations, sorted
     // from RS0-RSN
     reservationStations: Array<ReservationStationData>
 
-    // number of adder reservation stations
+    // Number of adder reservation stations
     adderReservationStationCount: number
 
-    // number of multiplier reservation stations
+    // Number of multiplier reservation stations
     multiplierReservationStationCount: number
 
-    // clock rate of the simulation, measured
+    // Clock rate of the simulation, measured
     // in ticks per second
     clockRate: number
 }
