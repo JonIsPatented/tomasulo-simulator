@@ -29,17 +29,22 @@ interface ReservationStationData {
     isEmpty: boolean
 }
 
+interface RegisterData {
+    // Alias for this register (to a reservation station),
+    // with a number indicating the index of the corresponding
+    // reservation station, and null indicating no alias
+    alias: number | null
+
+    // value currently stored in the register
+    value: number | null
+}
+
 interface SimulatorData {
     // Eventually, this will include a full copy
     // of the current state of the simulator
 
     // Values in the registers, sorted R0-RN
-    registerFile: Array<number>
-
-    // Aliases in the RAT, with null meaning no alias
-    // and a number indicating the index of the
-    // corresponding reservation station
-    registerAliasTable: Array<number | null>
+    registerFile: Array<RegisterData>
 
     // Values in the reservation stations, sorted
     // from RS0-RSN
@@ -97,8 +102,12 @@ export class Simulation {
 
     public readonly getSimulatorData = (): SimulatorData => {
         return { // TODO
-            registerFile: [1.2, -10.4, 8.0, -2.6],
-            registerAliasTable: [null, null, 1, null],
+            registerFile: [
+                { alias: null, value: 1.2 },
+                { alias: null, value: -10.4 },
+                { alias: 1, value: 8.0 },
+                { alias: null, value: -2.6 }
+            ],
             reservationStations: [
                 {
                     operation: '+',
