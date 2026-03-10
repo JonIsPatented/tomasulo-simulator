@@ -1,31 +1,35 @@
-.wrapper {
-    border: 1px solid #ccc;
+.collapsible-wrapper {
     margin-bottom: 10px;
-    border-radius: 12px;
-
 }
 
-.header {
+.collapse-trigger {
     background-color: #f1f1f1;
     color: #444;
-    margin: 0;
     cursor: pointer;
     padding: 18px;
     width: 100%;
     text-align: left;
     border: none;
-    box-sizing: border-box;
     border-radius: 8px;
     outline: none;
+    transition: background-color 0.3s ease;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.content {
-    overflow: hidden;
+.collapse-trigger:hover {
+    background-color: #ddd;
 }
 
-.inner {
+.collapsible-content {
+    overflow: hidden;
+    transition: height 0.6s ease-in-out;
+    border: 1px solid #ccc;
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+}
+
+.collapsible-inner {
     padding: 18px;
 }
