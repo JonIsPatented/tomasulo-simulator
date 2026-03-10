@@ -1,6 +1,3 @@
-// note that dispite my name being the last to edit this componet jon cole was actually the one to write this I'm just removing any refrence to it being collapsible
-// this is to comply with the latest email from our end user Daniel Koranek
-// this is not actually required to do however it will drive me crazy if it is not done 
 import './Container.css'
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 
@@ -9,12 +6,15 @@ interface CollapsibleContainerProps {
     children?: ReactNode,
 }
 
-export const Container = ({ title, children }: CollapsibleContainerProps) => {
+export const CollapsibleContainer = ({ title, children }: CollapsibleContainerProps) => {
 
-    
+    const [isOpen, setIsOpen] = useState(true)
     const [contentHeight, setContentHeight] = useState(0)
     const contentRef = useRef<HTMLDivElement>(null)
 
+    const toggleCollapse = () => {
+        setIsOpen(!isOpen)
+    }
 
     useEffect(() => {
         if (contentRef.current) {
@@ -23,16 +23,19 @@ export const Container = ({ title, children }: CollapsibleContainerProps) => {
     }, [children])
 
     return (
-        <div className='wrapper'>
-            <h2 className='header'>
+        <div className='collapsible-wrapper'>
+            <button className='collapse-trigger' onClick={toggleCollapse} aria-expanded={isOpen}>
                 {title}
-            </h2>
+                <span>{isOpen ? 'Close' : 'Open'}</span>
+            </button>
             <div
-                className={'content'}
-                >
+                className={'collapsible-content'}
+                aria-hidden={!isOpen}
+                style={{ height: isOpen ? `${contentHeight}px` : '0' }}
+            >
                 <div
                     ref={contentRef}
-                    className='inner'
+                    className='collapsible-inner'
                 >
                     {children}
                 </div>
