@@ -1,1 +1,18 @@
-.NavbarMain{background-color: brown;}
+.NavbarMain{
+    background-color: #282c72;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    margin-bottom: 1em;
+    border-radius: 12px;
+
+}
+.NavbarMain div{
+    width: stretch;
+}
+.NavbarMain h2{
+    width: 300%;
+}
+.NavbarMain h3{
+    margin: 2em;
+}
