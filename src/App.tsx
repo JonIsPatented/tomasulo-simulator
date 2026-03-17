@@ -3,6 +3,7 @@ import { CollapsibleContainer } from './components/CollapsibleContainer'
 import { Navbar } from './components/Navbar'
 import { PrimeReactProvider, PrimeReactContext } from 'primereact/api';
 import "primereact/resources/themes/lara-light-cyan/theme.css";
+import 'primeicons/primeicons.css';
 
         
 
