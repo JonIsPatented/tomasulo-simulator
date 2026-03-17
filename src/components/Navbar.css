@@ -7,12 +7,26 @@
     border-radius: 12px;
 
 }
-.NavbarMain div{
-    width: stretch;
-}
 .NavbarMain h2{
-    width: 300%;
+    display: ruby;
+}
+.NavbarMain .NavbarSpacer{
+    width: var(--stretch);
 }
 .NavbarMain h3{
     margin: 2em;
+}
+.NavbarMain .card{
+    margin: 1em;
+}
+.NavbarMain .Clock{
+    display: flex;
+    align-items: center;
+    width: 50% !important;
+}
+.NavbarMain .p-inputnumber{
+    height: 3em !important;
+}
+.NavbarMain .p-inputnumber-input{
+    width: 3em;
 }
