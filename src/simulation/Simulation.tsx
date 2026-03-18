@@ -1,4 +1,4 @@
-interface ReservationStationData {
+export interface ReservationStationData {
     // Which operation is being performed in this station
     // or null if the station is empty
     operation: '+' | '-' | '*' | '/' | null
@@ -29,7 +29,7 @@ interface ReservationStationData {
     isEmpty: boolean
 }
 
-interface RegisterData {
+export interface RegisterData {
     // Alias for this register (to a reservation station),
     // with a number indicating the index of the corresponding
     // reservation station, and null indicating no alias
@@ -39,7 +39,7 @@ interface RegisterData {
     value: number | null
 }
 
-interface SimulatorData {
+export interface SimulatorData {
     // Eventually, this will include a full copy
     // of the current state of the simulator
 
@@ -105,7 +105,7 @@ export class Simulation {
             registerFile: [
                 { alias: null, value: 1.2 },
                 { alias: null, value: -10.4 },
-                { alias: 1, value: 8.0 },
+                { alias: 1, value: null },
                 { alias: null, value: -2.6 }
             ],
             reservationStations: [
@@ -171,7 +171,7 @@ export class Simulation {
         this.timerId = setInterval(() => {
             this.tick()
             this.publish()
-        }, this.clockRatePerSecond * 1000)
+        }, 1000 / this.clockRatePerSecond)
     }
 
     public readonly stopClock = () => {

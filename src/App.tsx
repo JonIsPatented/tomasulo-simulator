@@ -1,14 +1,11 @@
-import './App.css'
-import { CollapsibleContainer } from './components/CollapsibleContainer'
+import { MainDiagram } from './components/MainDiagram'
 
 export const App = () => {
     return (
-        <div className='app-wrapper'>
-            <h1>Tomasulo's Algorithm Simulator</h1>
-            <CollapsibleContainer title={<h3>Example Container</h3>}>
-                <h3>Example of a Container</h3>
-                <p>This is an example of a collapsible container.</p>
-            </CollapsibleContainer>
-        </div>
+        <main className='flex justify-center min-h-screen items-start pt-6'>
+            <div className='w-full max-w-6xl'>
+                <MainDiagram />
+            </div>
+        </main>
     )
 }
