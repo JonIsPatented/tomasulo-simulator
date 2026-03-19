@@ -1,6 +1,6 @@
 import { Section } from './Section'
-import { RegisterFile } from './RegisterFile.tsx'
-import { ReservationStations } from './ReservationStations.tsx'
+import { RegisterFile } from './RegisterFile'
+import { ReservationStations } from './ReservationStations'
 import { useSimulation } from '../hooks/useSimulation'
 import { Simulation } from '../simulation/Simulation'
 import { Button } from 'primereact/button'

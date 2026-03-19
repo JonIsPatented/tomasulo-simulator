@@ -10,9 +10,9 @@ export const ReservationStations = () => {
     const multipliers = reservationStations.slice(adderReservationStationCount)
 
     return (
-        <div className="grid grid-cols-2 gap-4">
-            <RSGroup title="Add/Sub" stations={adders} start={0} />
-            <RSGroup title="Mul/Div" stations={multipliers} start={adderReservationStationCount} />
+        <div className='grid grid-cols-2 gap-4'>
+            <RSGroup title='Add/Sub' stations={adders} start={0} />
+            <RSGroup title='Mul/Div' stations={multipliers} start={adderReservationStationCount} />
         </div>
     )
 }
@@ -27,13 +27,13 @@ const RSGroup = ({
     start: number
 }) => {
     return (
-        <div className="flex flex-col gap-2">
+        <div className='flex flex-col gap-2'>
 
             {/* Group title */}
-            <span className="font-medium">{title}</span>
+            <span className='font-medium'>{title}</span>
 
             {/* Header row */}
-            <div className="grid grid-cols-6 text-xs font-semibold opacity-70 text-center">
+            <div className='grid grid-cols-6 text-xs font-semibold opacity-70 text-center'>
                 <span>Name</span>
                 <span>Op</span>
                 <span>Arg 1</span>
@@ -82,11 +82,11 @@ const RSRow = ({
                 rounded-sm
             `}
         >
-            <span className="font-medium text-center">RS{index}</span>
-            <span className="text-center">{rs.operation ?? '-'}</span>
-            <span className="text-center">{getValue(rs.firstArgumentValue, rs.firstArgumentStation)}</span>
-            <span className="text-center">{getValue(rs.secondArgumentValue, rs.secondArgumentStation)}</span>
-            <span className="text-center font-medium">{status}</span>
+            <span className='font-medium text-center'>RS{index}</span>
+            <span className='text-center'>{rs.operation ?? '-'}</span>
+            <span className='text-center'>{getValue(rs.firstArgumentValue, rs.firstArgumentStation)}</span>
+            <span className='text-center'>{getValue(rs.secondArgumentValue, rs.secondArgumentStation)}</span>
+            <span className='text-center font-medium'>{status}</span>
         </div>
     )
 }
