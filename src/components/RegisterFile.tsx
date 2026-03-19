@@ -1,7 +1,7 @@
 import { useSimulation } from '../hooks/useSimulation'
 
 export const RegisterFile = () => {
-    const { registerFile } = useSimulation()
+    const registerFile = useSimulation((data) => data.registerFile)
 
     return (
         <div className="flex flex-col gap-2">

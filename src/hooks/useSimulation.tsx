@@ -1,17 +1,26 @@
 import { useEffect, useState } from 'react'
-import { Simulation } from '../simulation/Simulation.tsx'
+import { Simulation, type SimulatorData } from '../simulation/Simulation.tsx'
+import isEqual from 'react-fast-compare'
 
-export const useSimulation = () => {
+type Narrower<T> = (data: SimulatorData) => T
+
+export const useSimulation = <T,>(narrower: Narrower<T>) => {
     const simulation = Simulation.getSimulation()
 
-    const [data, setData] = useState(
-        simulation.getSimulatorData()
+    const [data, setData] = useState<T>(
+        narrower(simulation.getSimulatorData())
     )
 
     useEffect(() => {
         const id = crypto.randomUUID()
 
-        simulation.subscribe(setData, id)
+        const subscriber = (data: SimulatorData) => {
+            const newData = narrower(data)
+            if (isEqual(data, newData)) return
+            setData(newData)
+        }
+
+        simulation.subscribe(subscriber, id)
 
         return () => {
             simulation.unsubscribe(id)

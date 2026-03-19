@@ -2,7 +2,9 @@ import { useSimulation } from '../hooks/useSimulation'
 import { type ReservationStationData } from '../simulation/Simulation'
 
 export const ReservationStations = () => {
-    const { reservationStations, adderReservationStationCount } = useSimulation()
+    const [reservationStations, adderReservationStationCount] = useSimulation(
+        (data) => [data.reservationStations, data.adderReservationStationCount]
+    )
 
     const adders = reservationStations.slice(0, adderReservationStationCount)
     const multipliers = reservationStations.slice(adderReservationStationCount)

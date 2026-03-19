@@ -7,9 +7,7 @@ import { Button } from 'primereact/button'
 
 export const MainDiagram = () => {
 
-    const {
-        clockRate
-    } = useSimulation()
+    const clockRate = useSimulation((data) => data.clockRate)
 
     const simulation = Simulation.getSimulation()
 

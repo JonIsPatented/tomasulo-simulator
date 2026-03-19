@@ -100,66 +100,67 @@ export class Simulation {
         return true
     }
 
+    private currentState: SimulatorData = { // TODO
+        registerFile: [
+            { alias: null, value: 1.2 },
+            { alias: null, value: -10.4 },
+            { alias: 1, value: null },
+            { alias: null, value: -2.6 }
+        ],
+        reservationStations: [
+            {
+                operation: '+',
+                firstArgumentValue: 10,
+                firstArgumentStation: null,
+                secondArgumentValue: null,
+                secondArgumentStation: 3,
+                isEmpty: false
+            },
+            {
+                operation: '-',
+                firstArgumentValue: null,
+                firstArgumentStation: 0,
+                secondArgumentValue: null,
+                secondArgumentStation: 3,
+                isEmpty: false
+            },
+            {
+                operation: null,
+                firstArgumentValue: null,
+                firstArgumentStation: null,
+                secondArgumentValue: null,
+                secondArgumentStation: null,
+                isEmpty: true
+            },
+            {
+                operation: '*',
+                firstArgumentValue: 10,
+                firstArgumentStation: null,
+                secondArgumentValue: 14.6,
+                secondArgumentStation: null,
+                isEmpty: false
+            },
+            {
+                operation: null,
+                firstArgumentValue: null,
+                firstArgumentStation: null,
+                secondArgumentValue: null,
+                secondArgumentStation: null,
+                isEmpty: true
+            },
+        ],
+        adderReservationStationCount: 3,
+        multiplierReservationStationCount: 2,
+        clockRate: 2
+    }
+
     public readonly getSimulatorData = (): SimulatorData => {
-        return { // TODO
-            registerFile: [
-                { alias: null, value: 1.2 },
-                { alias: null, value: -10.4 },
-                { alias: 1, value: null },
-                { alias: null, value: -2.6 }
-            ],
-            reservationStations: [
-                {
-                    operation: '+',
-                    firstArgumentValue: 10,
-                    firstArgumentStation: null,
-                    secondArgumentValue: null,
-                    secondArgumentStation: 3,
-                    isEmpty: false
-                },
-                {
-                    operation: '-',
-                    firstArgumentValue: null,
-                    firstArgumentStation: 0,
-                    secondArgumentValue: null,
-                    secondArgumentStation: 3,
-                    isEmpty: false
-                },
-                {
-                    operation: null,
-                    firstArgumentValue: null,
-                    firstArgumentStation: null,
-                    secondArgumentValue: null,
-                    secondArgumentStation: null,
-                    isEmpty: true
-                },
-                {
-                    operation: '*',
-                    firstArgumentValue: 10,
-                    firstArgumentStation: null,
-                    secondArgumentValue: 14.6,
-                    secondArgumentStation: null,
-                    isEmpty: false
-                },
-                {
-                    operation: null,
-                    firstArgumentValue: null,
-                    firstArgumentStation: null,
-                    secondArgumentValue: null,
-                    secondArgumentStation: null,
-                    isEmpty: true
-                },
-            ],
-            adderReservationStationCount: 3,
-            multiplierReservationStationCount: 2,
-            clockRate: 2
-        }
+        return this.currentState
     }
 
     private readonly publish = () => {
-        const data = this.getSimulatorData()
         this.subscribers.forEach((subscriber) => {
-            subscriber.func(data)
+            subscriber.func(this.currentState)
         })
     }
 
@@ -186,8 +187,24 @@ export class Simulation {
         this.publish()
     }
 
-    private readonly tick = () => {
-        // TODO
+    private readonly tick = () => { // TODO
+        // Replace currentState with a perfect
+        // copy but with 0.5 added to R0
+        this.currentState = {
+            ...this.currentState,
+            registerFile: this.currentState.registerFile.map(
+                (register, i) => {
+                    if (i == 0) {
+                        return {
+                            ...register,
+                            value: register.value !== null ?
+                                register.value + 0.5 : null
+                        }
+                    }
+                    return register
+                }
+            )
+        }
     }
 
 }
