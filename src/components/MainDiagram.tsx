@@ -4,6 +4,7 @@ import { ReservationStations } from './ReservationStations'
 import { useSimulation } from '../hooks/useSimulation'
 import { Simulation } from '../simulation/Simulation'
 import { Button } from 'primereact/button'
+import { Slider } from 'primereact/slider'
 
 export const MainDiagram = () => {
 
@@ -12,7 +13,7 @@ export const MainDiagram = () => {
     const simulation = Simulation.getSimulation()
 
     return (
-        <div className='w-full h-full p-4'>
+        <div className='h-full p-4'>
             <div className='grid grid-cols-12 gap-4 auto-rows-fr'>
 
                 {/* Controls */}
