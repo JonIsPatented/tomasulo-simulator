@@ -5,7 +5,7 @@ import { useSimulation } from '../hooks/useSimulation'
 import { Simulation } from '../simulation/Simulation'
 import { Button } from 'primereact/button'
 import { Dialog } from 'primereact/dialog'
-import { useRef, useState} from 'react'
+import { useRef, useState } from 'react'
 import { OverlayPanel } from 'primereact/overlaypanel'
 import { Slider, type SliderChangeEvent } from 'primereact/slider'
 import { InputNumber, type InputNumberValueChangeEvent } from 'primereact/inputnumber'
@@ -25,22 +25,22 @@ export const MainDiagram = () => {
     };
 
 
-    let [clockRate, setClockRate] = useState(useSimulation((data) => data.clockRate))
+    const clockRate = useSimulation((data) => data.clockRate)
 
     const simulation = Simulation.getSimulation()
 
     return (
-        <div className='w-full h-full p-4'>
+        <div className='h-full p-4'>
             <div className='grid grid-cols-12 gap-4 auto-rows-fr'>
 
                 {/* Controls */}
                 <div className='col-span-12 flex justify-between items-center'>
-                    <Button 
+                    <Button
                         icon="pi pi-cog"
                         onClick={() => show()}
                     />
 
-                    <Dialog header="Instruction Durations" visible={visible} position={'bottom'} style={{ width: '50vw' }} onHide={() => {if (!visible) return; setVisible(false); }} resizable={false}>
+                    <Dialog header="Instruction Durations" visible={visible} position={'bottom'} style={{ width: '50vw' }} onHide={() => { if (!visible) return; setVisible(false); }} resizable={false}>
                         <p className="m-0">
                             [list instructions here]
                         </p>
@@ -62,32 +62,38 @@ export const MainDiagram = () => {
                             severity="danger"
                             onClick={simulation.stopClock}
                         />
-                        
-                        <Button type="button" icon="pi pi-clock" label={getClockRateText()} onClick={(e) => 
-                            {op.current.toggle(e)
-                            }} />
+                        <Button
+                            type="button"
+                            icon="pi pi-clock"
+                            label={getClockRateText()}
+                            onClick={(e) => {
+                                op.current!.toggle(e)
+                            }}
+                        />
                         <OverlayPanel ref={op}>
-                            <Slider 
-                                value={clockRate}
-                                min={1}
-                                max={10}
-                                onChange={(e: SliderChangeEvent) => 
-                                    {simulation.setClockRate(e.value)
-                                        setClockRate(e.value)
+                            <div
+                                className='p-2 grid grid-cols-2 items-center'
+                            >
+                                <Slider
+                                    value={clockRate}
+                                    min={1}
+                                    max={10}
+                                    onChange={(e: SliderChangeEvent) => {
+                                        simulation.setClockRate(e.value)
                                     }}
-                            />
-                            <InputNumber 
-                                value={clockRate}
-                                onValueChange={(e: InputNumberValueChangeEvent) => 
-                                    {simulation.setClockRate(e.value)
-                                        setClockRate(e.value)
+                                />
+                                <InputNumber
+                                    value={clockRate}
+                                    onValueChange={(e: InputNumberValueChangeEvent) => {
+                                        simulation.setClockRate(e.value)
                                         console.log(clockRate)
                                     }}
-                                mode="decimal"
-                                showButtons
-                                min={1}
-                                max={10}
-                            />
+                                    mode="decimal"
+                                    showButtons
+                                    min={1}
+                                    max={10}
+                                />
+                            </div>
                         </OverlayPanel>
                     </div>
                 </div>
