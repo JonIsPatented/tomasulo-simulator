@@ -29,6 +29,27 @@ export interface ReservationStationData {
     isEmpty: boolean
 }
 
+export interface LoadStoreBufferData {
+
+    // Memory address if known, or null if still waiting
+    addressValue: number | null
+
+    // Reservation station this address is waiting on,
+    // or null if not waiting
+    addressStation: number | null
+
+    // Value to store.
+    // This can be null if it's a load buffer
+    dataValue: number | null
+
+    // Reservation station this data is waiting on,
+    // or null if not waiting
+    dataStation: number | null
+
+    // Whether this buffer is empty
+    isEmpty: boolean
+}
+
 export interface RegisterData {
     // Alias for this register (to a reservation station),
     // with a number indicating the index of the corresponding
@@ -49,6 +70,12 @@ export interface SimulatorData {
     // Values in the reservation stations, sorted
     // from RS0-RSN
     reservationStations: Array<ReservationStationData>
+
+    // Load buffers
+    loadBuffers: Array<LoadStoreBufferData>,
+
+    // Store buffers
+    storeBuffers: Array<LoadStoreBufferData>
 
     // Number of adder reservation stations
     adderReservationStationCount: number
@@ -147,6 +174,66 @@ export class Simulation {
                 secondArgumentValue: null,
                 secondArgumentStation: null,
                 isEmpty: true
+            },
+        ],
+        loadBuffers: [
+            {
+                addressValue: null,
+                addressStation: null,
+                dataValue: null,
+                dataStation: null,
+                isEmpty: false
+            },
+            {
+                addressValue: null,
+                addressStation: null,
+                dataValue: null,
+                dataStation: null,
+                isEmpty: false
+            },            
+            {
+                addressValue: null,
+                addressStation: null,
+                dataValue: null,
+                dataStation: null,
+                isEmpty: false
+            },
+            {
+                addressValue: null,
+                addressStation: null,
+                dataValue: null,
+                dataStation: null,
+                isEmpty: false
+            },
+        ],
+        storeBuffers: [
+            {
+                addressValue: null,
+                addressStation: null,
+                dataValue: null,
+                dataStation: null,
+                isEmpty: false
+            },
+            {
+                addressValue: null,
+                addressStation: null,
+                dataValue: null,
+                dataStation: null,
+                isEmpty: false
+            },
+            {
+                addressValue: null,
+                addressStation: null,
+                dataValue: null,
+                dataStation: null,
+                isEmpty: false
+            },
+            {
+                addressValue: 67,
+                addressStation: null,
+                dataValue: null,
+                dataStation: 3,
+                isEmpty: false
             },
         ],
         adderReservationStationCount: 3,
