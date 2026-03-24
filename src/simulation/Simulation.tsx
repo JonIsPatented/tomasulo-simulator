@@ -64,6 +64,47 @@ export interface RegisterData {
     value: number | null
 }
 
+export interface DataBus {
+    // The value being broadcast. Null if no value
+    // is being broadcast at the moment.
+    value: number | null
+
+    // The index of the reservation station corresponding
+    // to the operation that produced this value, or null
+    // if the bus is off or the data is from memory rather
+    // than from a function unit
+    sourceStation: number | null
+
+    // The index of the register the load operation
+    // is writing to, or null if data bus is off or
+    // if the data is not from memory
+    destinationRegister: number | null
+}
+
+export interface FunctionUnit {
+    // Which operation is being performed in this station
+    // or null if the station is empty
+    operation: '+' | '-' | '*' | '/' | null
+
+    // The value of the first argument, or null if
+    // the argument is awaiting another station or
+    // if this station is empty
+    firstArgumentValue: number | null
+
+    // The value of the second argument, or null if
+    // the argument is awaiting another station or
+    // if this station is empty
+    secondArgumentValue: number | null
+
+    // The number of cycles left in the current function
+    // execution for this unit, or null if no operation
+    // is in progress
+    ticksLeft: number | null
+
+    // Whether this station is empty
+    isEmpty: boolean
+}
+
 export interface SimulatorData {
     // Eventually, this will include a full copy
     // of the current state of the simulator
@@ -86,6 +127,17 @@ export interface SimulatorData {
 
     // Number of multiplier reservation stations
     multiplierReservationStationCount: number
+
+    // Common data bus for broadcast data
+    commonDataBus: DataBus
+
+    // Adders/subtractors for operation on values in
+    // the add/sub reservation stations
+    addSubtractFunctionUnits: Array<FunctionUnit>
+
+    // multipliers/dividers for operation on values in
+    // the mul/div reservation stations
+    multiplyDivideFunctionUnits: Array<FunctionUnit>
 
     // Clock rate of the simulation, measured
     // in ticks per second
@@ -239,6 +291,29 @@ export class Simulation {
                 dataStation: 3,
                 isEmpty: false
             },
+        ],
+        commonDataBus: {
+            value: null,
+            sourceStation: null,
+            destinationRegister: null
+        },
+        addSubtractFunctionUnits: [
+            {
+                operation: null,
+                firstArgumentValue: null,
+                secondArgumentValue: null,
+                ticksLeft: null,
+                isEmpty: true
+            }
+        ],
+        multiplyDivideFunctionUnits: [
+            {
+                operation: null,
+                firstArgumentValue: null,
+                secondArgumentValue: null,
+                ticksLeft: null,
+                isEmpty: true
+            }
         ],
         adderReservationStationCount: 3,
         multiplierReservationStationCount: 2,
