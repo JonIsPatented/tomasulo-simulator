@@ -1,15 +1,17 @@
-type SubSectionProps = {
+import { Flex, Text } from '@radix-ui/themes'
+
+type SubsectionProps = {
     title: string
     children?: React.ReactNode
 }
 
-export const SubSection = ({ title, children }: SubSectionProps) => {
+export const Subsection = ({ title, children }: SubsectionProps) => {
     return (
-        <div className='flex flex-col gap-1'>
-            <span className='text-sm font-medium'>
+        <Flex direction="column" gap="1">
+            <Text size="2" weight="medium">
                 {title}
-            </span>
+            </Text>
             {children}
-        </div>
+        </Flex>
     )
 }

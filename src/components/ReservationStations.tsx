@@ -1,21 +1,6 @@
 import { useSimulation } from '../hooks/useSimulation'
 import { type ReservationStationData } from '../simulation/Simulation'
-
-export const ReservationStations = () => {
-    const [reservationStations, adderReservationStationCount] = useSimulation(
-        (data) => [data.reservationStations, data.adderReservationStationCount]
-    )
-
-    const adders = reservationStations.slice(0, adderReservationStationCount)
-    const multipliers = reservationStations.slice(adderReservationStationCount)
-
-    return (
-        <div className='grid grid-cols-2 gap-4'>
-            <RSGroup title='Add/Sub' stations={adders} start={0} />
-            <RSGroup title='Mul/Div' stations={multipliers} start={adderReservationStationCount} />
-        </div>
-    )
-}
+import { Flex, Grid, Text } from '@radix-ui/themes'
 
 const RSGroup = ({
     title,
@@ -27,25 +12,25 @@ const RSGroup = ({
     start: number
 }) => {
     return (
-        <div className='flex flex-col gap-2'>
+        <Flex direction="column" gap="2">
+            <Text size="2" weight="bold">
+                {title}
+            </Text>
 
-            {/* Group title */}
-            <span className='font-medium'>{title}</span>
+            <Grid columns="5" gap="2" className="items-center text-sm whitespace-nowrap">
 
-            {/* Header row */}
-            <div className='grid grid-cols-6 text-xs font-semibold opacity-70 text-center'>
-                <span>Name</span>
-                <span>Op</span>
-                <span>Arg 1</span>
-                <span>Arg 2</span>
-                <span>Status</span>
-            </div>
+                {/* Header */}
+                <Text size="1" weight="bold" color="gray">Name</Text>
+                <Text size="1" weight="bold" color="gray">Op</Text>
+                <Text size="1" weight="bold" color="gray">Arg 1</Text>
+                <Text size="1" weight="bold" color="gray">Arg 2</Text>
+                <Text size="1" weight="bold" color="gray">Status</Text>
 
-            {/* Station rows */}
-            {stations.map((rs, i) => (
-                <RSRow key={start + i} rs={rs} index={start + i} />
-            ))}
-        </div>
+                {stations.map((rs, i) => (
+                    <RSRow key={start + i} rs={rs} index={start + i} />
+                ))}
+            </Grid>
+        </Flex>
     )
 }
 
@@ -62,7 +47,6 @@ const RSRow = ({
         return '-'
     }
 
-    // Determine station status for styling
     const status =
         rs.isEmpty
             ? 'Free'
@@ -70,23 +54,48 @@ const RSRow = ({
                 ? 'Ready'
                 : 'Waiting'
 
-    const isWaiting = status === 'Waiting'
+    const color =
+        status === 'Waiting' ? 'amber' :
+            status === 'Ready' ? 'green' :
+                'gray'
 
     return (
-        <div
-            className={`
-                grid grid-cols-6 items-center text-sm
-                py-1 px-2
-                ${isWaiting ? 'opacity-70 italic' : ''}
-                border-b border-gray-200
-                rounded-sm
-            `}
-        >
-            <span className='font-medium text-center'>RS{index}</span>
-            <span className='text-center'>{rs.operation ?? '-'}</span>
-            <span className='text-center'>{getValue(rs.firstArgumentValue, rs.firstArgumentStation)}</span>
-            <span className='text-center'>{getValue(rs.secondArgumentValue, rs.secondArgumentStation)}</span>
-            <span className='text-center font-medium'>{status}</span>
-        </div>
+        <>
+            <Text weight="medium" className="border-b border-gray-100 py-1">
+                RS{index}
+            </Text>
+            <Text className="border-b border-gray-100 py-1">
+                {rs.operation ?? '-'}
+            </Text>
+            <Text className="border-b border-gray-100 py-1">
+                {getValue(rs.firstArgumentValue, rs.firstArgumentStation)}
+            </Text>
+            <Text className="border-b border-gray-100 py-1">
+                {getValue(rs.secondArgumentValue, rs.secondArgumentStation)}
+            </Text>
+            <Text
+                color={color}
+                weight="medium"
+                className="border-b border-gray-100 py-1"
+            >
+                {status}
+            </Text>
+        </>
+    )
+}
+
+export const ReservationStations = () => {
+    const [reservationStations, adderReservationStationCount] = useSimulation(
+        (data) => [data.reservationStations, data.adderReservationStationCount]
+    )
+
+    const adders = reservationStations.slice(0, adderReservationStationCount)
+    const multipliers = reservationStations.slice(adderReservationStationCount)
+
+    return (
+        <Grid columns="2" gap="4">
+            <RSGroup title='Add/Sub' stations={adders} start={0} />
+            <RSGroup title='Mul/Div' stations={multipliers} start={adderReservationStationCount} />
+        </Grid>
     )
 }

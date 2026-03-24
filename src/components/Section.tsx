@@ -1,4 +1,4 @@
-import { Panel } from 'primereact/panel'
+import { Card, Flex, Text } from '@radix-ui/themes'
 
 type SectionProps = {
     title: string
@@ -7,10 +7,16 @@ type SectionProps = {
 
 export const Section = ({ title, children }: SectionProps) => {
     return (
-        <Panel header={title} className='w-full shadow-md rounded-lg'>
-            <div className='flex flex-col gap-2'>
+        <Card>
+            <Flex direction="column" gap="3">
+                <Text size="2" weight="bold">
+                    {title}
+                </Text>
+
+                <div className="border-t border-gray-200" />
+
                 {children}
-            </div>
-        </Panel>
+            </Flex>
+        </Card>
     )
 }
