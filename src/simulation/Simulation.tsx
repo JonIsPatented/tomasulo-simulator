@@ -268,9 +268,10 @@ export class Simulation {
     }
 
     public readonly setClockRate = (newRatePerSecond: number) => {
+        const wasRunning: boolean = !!this.timerId
         this.stopClock()
         this.clockRatePerSecond = newRatePerSecond
-        this.startClock()
+        if (wasRunning) this.startClock()
         this.publish()
     }
 

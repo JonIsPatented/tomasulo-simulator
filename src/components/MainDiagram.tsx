@@ -30,8 +30,25 @@ export const MainDiagram = () => {
                                 Stop
                             </Button>
 
+                            <input 
+                                type="number" 
+                                id="quantity" 
+                                name="quantity" 
+                                min="1" 
+                                max="10"
+                                defaultValue={clockRate}
+                                onChange={(e) => {
+                                    //I love having to manually sanitize
+                                    if (e.currentTarget.value == "") {
+                                        e.currentTarget.value = "1"
+                                    }
+                                    const clamped: number = Math.min(Math.max(parseInt(e.currentTarget.value), 1), 10)
+                                    e.currentTarget.value = clamped.toString()
+                                    simulation.setClockRate(clamped)
+                                }}
+                            />
                             <Text size="2">
-                                {clockRate} ticks/sec
+                                ticks/sec
                             </Text>
                         </Flex>
                     </Flex>
