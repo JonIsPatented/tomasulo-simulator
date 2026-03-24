@@ -4,7 +4,7 @@ import { ReservationStations } from './ReservationStations'
 import { useSimulation } from '../hooks/useSimulation'
 import { Simulation } from '../simulation/Simulation'
 
-import { Button, Flex, Text, Heading } from '@radix-ui/themes'
+import { Button, Flex, Text, Heading, Dialog, Slider } from '@radix-ui/themes'
 
 export const MainDiagram = () => {
     const clockRate = useSimulation((data) => data.clockRate)
@@ -17,6 +17,25 @@ export const MainDiagram = () => {
                 {/* Controls */}
                 <div className='col-span-12'>
                     <Flex justify="between" align="center">
+                        <Dialog.Root>
+                            <Dialog.Trigger>
+                                <Button variant='outline' >Settings</Button>
+                            </Dialog.Trigger>
+                                    <Dialog.Content className="DialogContent">
+                                        <Dialog.Title className="DialogTitle">Settings</Dialog.Title>
+                                        <Dialog.Description className="DialogDescription">
+                                            Change how many clock cycles each instruction takes.
+                                        </Dialog.Description>
+                                        <div className='flex items-center gap-2'>Test:
+                                            <Slider 
+                                                variant='classic'
+                                                min={1}
+                                                max={10}
+                                            />
+                                        </div>
+                                    </Dialog.Content>
+                        </Dialog.Root>
+
                         <Heading size="4">
                             Tomasulo Simulator
                         </Heading>
