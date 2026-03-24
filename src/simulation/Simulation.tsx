@@ -1,3 +1,7 @@
+import { broadcastStep } from './Broadcast.tsx'
+import { dispatchStep } from './Dispatch.tsx'
+import { issueStep } from './Issue.tsx'
+
 export interface ReservationStationData {
     // Which operation is being performed in this station
     // or null if the station is empty
@@ -274,30 +278,10 @@ export class Simulation {
         this.publish()
     }
 
-    private readonly tick = () => { // TODO
+    private readonly tick = () => {
         this.currentState = [this.currentState]
-            .map(placeholderStep)
-            .map(data => data)[0]
+            .map(issueStep)
+            .map(dispatchStep)
+            .map(broadcastStep)[0]
     }
 }
-
-const placeholderStep = (data: SimulatorData) => {
-    // Replace currentState with a perfect
-    // copy but with 0.5 added to R0
-    return {
-        ...data,
-        registerFile: data.registerFile.map(
-            (register, i) => {
-                if (i == 0) {
-                    return {
-                        ...register,
-                        value: register.value !== null ?
-                            register.value + 0.5 : null
-                    }
-                }
-                return register
-            }
-        )
-    }
-}
-
