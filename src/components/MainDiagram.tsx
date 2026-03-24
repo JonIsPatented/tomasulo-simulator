@@ -3,49 +3,44 @@ import { RegisterFile } from './RegisterFile'
 import { ReservationStations } from './ReservationStations'
 import { useSimulation } from '../hooks/useSimulation'
 import { Simulation } from '../simulation/Simulation'
-import { Button } from 'primereact/button'
-import { Slider } from 'primereact/slider'
+
+import { Button, Flex, Text, Heading } from '@radix-ui/themes'
 
 export const MainDiagram = () => {
-
     const clockRate = useSimulation((data) => data.clockRate)
-
     const simulation = Simulation.getSimulation()
 
     return (
         <div className='h-full p-4'>
-            <div className='grid grid-cols-12 gap-4 auto-rows-fr'>
+            <div className='grid grid-cols-12 gap-4 auto-rows-auto'>
 
                 {/* Controls */}
-                <div className='col-span-12 flex justify-between items-center'>
-                    <h2 className='text-xl font-semibold'>
-                        Tomasulo Simulator
-                    </h2>
+                <div className='col-span-12'>
+                    <Flex justify="between" align="center">
+                        <Heading size="4">
+                            Tomasulo Simulator
+                        </Heading>
 
-                    <div className='flex gap-2 items-center'>
-                        <Button
-                            label="Start"
-                            icon="pi pi-play"
-                            onClick={simulation.startClock}
-                        />
-                        <Button
-                            label="Stop"
-                            icon="pi pi-stop"
-                            severity="danger"
-                            onClick={simulation.stopClock}
-                        />
-                        <span className='text-sm'>
-                            {clockRate} ticks/sec
-                        </span>
-                    </div>
+                        <Flex gap="2" align="center">
+                            <Button onClick={simulation.startClock} variant="outline">
+                                Start
+                            </Button>
+
+                            <Button onClick={simulation.stopClock} variant="outline">
+                                Stop
+                            </Button>
+
+                            <Text size="2">
+                                {clockRate} ticks/sec
+                            </Text>
+                        </Flex>
+                    </Flex>
                 </div>
 
-                {/* Instruction Queue (placeholder for now) */}
+                {/* Instruction Queue */}
                 <div className='col-span-12'>
                     <Section title='Instruction Queue'>
-                        <div className='text-sm'>
-                            (TODO)
-                        </div>
+                        <Text size="2">(TODO)</Text>
                     </Section>
                 </div>
 
@@ -63,29 +58,27 @@ export const MainDiagram = () => {
                     </Section>
                 </div>
 
-                {/* Load / Store Buffers (placeholder) */}
+                {/* Load / Store Buffers */}
                 <div className='col-span-3'>
                     <Section title='Load / Store Buffers'>
-                        <div className='text-sm'>
-                            (TODO)
-                        </div>
+                        <Text size="2">(TODO)</Text>
                     </Section>
                 </div>
 
-                {/* Functional Units (placeholder) */}
+                {/* Functional Units */}
                 <div className='col-span-6 col-start-4'>
                     <Section title='Functional Units'>
-                        <div className='text-sm'>
-                            (TODO)
-                        </div>
+                        <Text size="2">(TODO)</Text>
                     </Section>
                 </div>
 
                 {/* Common Data Bus */}
                 <div className='col-span-12'>
-                    <div className='text-center py-2 font-medium'>
-                        Common Data Bus (TODO)
-                    </div>
+                    <Flex justify='center'>
+                        <Text weight="medium">
+                            Common Data Bus (TODO)
+                        </Text>
+                    </Flex>
                 </div>
 
             </div>
