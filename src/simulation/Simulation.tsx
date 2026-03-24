@@ -101,6 +101,11 @@ export interface FunctionUnit {
     // is in progress
     ticksLeft: number | null
 
+    // The index of the reservation station that this
+    // operation was dispatched from, or null if no
+    // operation is in progress
+    sourceReservationStation: number | null
+
     // Whether this station is empty
     isEmpty: boolean
 }
@@ -303,6 +308,7 @@ export class Simulation {
                 firstArgumentValue: null,
                 secondArgumentValue: null,
                 ticksLeft: null,
+                sourceReservationStation: null,
                 isEmpty: true
             }
         ],
@@ -312,6 +318,7 @@ export class Simulation {
                 firstArgumentValue: null,
                 secondArgumentValue: null,
                 ticksLeft: null,
+                sourceReservationStation: null,
                 isEmpty: true
             }
         ],
