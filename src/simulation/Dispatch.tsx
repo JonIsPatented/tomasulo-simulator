@@ -1,7 +1,9 @@
 import type { SimulatorData } from "./Simulation";
 
 export const dispatchStep = (currentState: SimulatorData) => {
-    // TODO
+
+    const bus = currentState.commonDataBus
+
     return {
         ...currentState
     }
