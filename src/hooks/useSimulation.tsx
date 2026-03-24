@@ -14,8 +14,8 @@ export const useSimulation = <T,>(narrower: Narrower<T>) => {
     useEffect(() => {
         const id = crypto.randomUUID()
 
-        const subscriber = (data: SimulatorData) => {
-            const newData = narrower(data)
+        const subscriber = (simData: SimulatorData) => {
+            const newData = narrower(simData)
             if (isEqual(data, newData)) return
             setData(newData)
         }
