@@ -190,7 +190,7 @@ export class Simulation {
                 dataValue: null,
                 dataStation: null,
                 isEmpty: false
-            },            
+            },
             {
                 addressValue: null,
                 addressStation: null,
@@ -275,23 +275,29 @@ export class Simulation {
     }
 
     private readonly tick = () => { // TODO
-        // Replace currentState with a perfect
-        // copy but with 0.5 added to R0
-        this.currentState = {
-            ...this.currentState,
-            registerFile: this.currentState.registerFile.map(
-                (register, i) => {
-                    if (i == 0) {
-                        return {
-                            ...register,
-                            value: register.value !== null ?
-                                register.value + 0.5 : null
-                        }
-                    }
-                    return register
-                }
-            )
-        }
+        this.currentState = [this.currentState]
+            .map(placeholderStep)
+            .map(data => data)[0]
     }
-
 }
+
+const placeholderStep = (data: SimulatorData) => {
+    // Replace currentState with a perfect
+    // copy but with 0.5 added to R0
+    return {
+        ...data,
+        registerFile: data.registerFile.map(
+            (register, i) => {
+                if (i == 0) {
+                    return {
+                        ...register,
+                        value: register.value !== null ?
+                            register.value + 0.5 : null
+                    }
+                }
+                return register
+            }
+        )
+    }
+}
+
