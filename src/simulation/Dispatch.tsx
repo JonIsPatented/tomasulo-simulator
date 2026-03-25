@@ -79,6 +79,7 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
                     operation: station.operation,
                     firstArgumentValue: station.firstArgumentValue,
                     secondArgumentValue: station.secondArgumentValue,
+                    sourceReservationStation: readyAddSubStation.i,
                     ticksLeft: 2,
                     isEmpty: false
                 }
@@ -114,6 +115,7 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
                     operation: station.operation,
                     firstArgumentValue: station.firstArgumentValue,
                     secondArgumentValue: station.secondArgumentValue,
+                    sourceReservationStation: readyMulDivStation.i,
                     ticksLeft: 2,
                     isEmpty: false
                 }
