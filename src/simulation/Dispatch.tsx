@@ -1,4 +1,4 @@
-import type { ReservationStationData, SimulatorData } from "./Simulation";
+import type { FunctionUnit, ReservationStationData, SimulatorData } from "./Simulation";
 
 export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (currentState: SimulatorData) => {
 
@@ -10,43 +10,60 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
     if (bus.value !== null) {
         if (bus.sourceStation !== null) {
             resStations = resStations.map((station) => {
+                const firstFromStation = station.firstArgumentStation === bus.sourceStation
+                const secondFromStation = station.secondArgumentStation === bus.sourceStation
+
                 return {
                     ...station,
-                    firstArgumentValue:
-                        station.firstArgumentStation === bus.sourceStation ?
-                            bus.value : station.firstArgumentValue,
-                    secondArgumentValue:
-                        station.secondArgumentStation === bus.sourceStation ?
-                            bus.value : station.secondArgumentValue,
+                    firstArgumentValue: firstFromStation ? bus.value : station.firstArgumentValue,
+                    firstArgumentStation: firstFromStation ? null : station.firstArgumentStation,
+                    firstArgumentWaitingRegister: firstFromStation ? null : station.firstArgumentWaitingRegister,
+
+                    secondArgumentValue: secondFromStation ? bus.value : station.secondArgumentValue,
+                    secondArgumentStation: secondFromStation ? null : station.secondArgumentStation,
+                    secondArgumentWaitingRegister: secondFromStation ? null : station.secondArgumentWaitingRegister,
                 }
+            })
+            regFile = regFile.map((register) => {
+                if (register.alias === bus.sourceStation) {
+                    return {
+                        ...register,
+                        value: bus.value,
+                        alias: null
+                    }
+                }
+                return register
             })
         }
         else if (bus.destinationRegister !== null) {
             resStations = resStations.map((station) => {
+                const firstFromRegister = station.firstArgumentWaitingRegister === bus.destinationRegister
+                const secondFromRegister = station.secondArgumentWaitingRegister === bus.destinationRegister
+
                 return {
                     ...station,
-                    firstArgumentValue:
-                        station.firstArgumentWaitingRegister ===
-                            bus.destinationRegister ?
-                            bus.value : station.firstArgumentValue,
-                    secondArgumentValue:
-                        station.secondArgumentWaitingRegister ===
-                            bus.destinationRegister ?
-                            bus.value : station.secondArgumentValue,
+                    firstArgumentValue: firstFromRegister ? bus.value : station.firstArgumentValue,
+                    firstArgumentWaitingRegister: firstFromRegister ? null : station.firstArgumentWaitingRegister,
+
+                    secondArgumentValue: secondFromRegister ? bus.value : station.secondArgumentValue,
+                    secondArgumentWaitingRegister: secondFromRegister ? null : station.secondArgumentWaitingRegister
                 }
             })
             regFile = regFile.map((register, i) => {
-                return {
-                    ...register,
-                    value:
-                        i === bus.destinationRegister ?
-                            bus.value : register.value
+                if (i === bus.destinationRegister) {
+                    return {
+                        ...register,
+                        value: bus.value,
+                        alias: null
+                    }
                 }
+                return register
             })
         }
     }
 
     const isReady = (station: ReservationStationData) =>
+        !station.isEmpty &&
         station.firstArgumentValue !== null &&
         station.secondArgumentValue !== null
 
@@ -62,8 +79,16 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
         }
     }
 
-    let addSubFuncUnits = currentState.addSubtractFunctionUnits
-    let mulDivFuncUnits = currentState.multiplyDivideFunctionUnits
+    const dec = (fu: FunctionUnit) => {
+        if (fu.ticksLeft === null) return fu
+        if (fu.ticksLeft === 0) return fu
+        return {
+            ...fu,
+            ticksLeft: fu.ticksLeft - 1
+        }
+    }
+    let addSubFuncUnits = currentState.addSubtractFunctionUnits.map(dec)
+    let mulDivFuncUnits = currentState.multiplyDivideFunctionUnits.map(dec)
 
     if (addSubFuncUnits[0].isEmpty) {
         const readyAddSubStation = readyStationsByIndex.find(
@@ -116,7 +141,7 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
                     firstArgumentValue: station.firstArgumentValue,
                     secondArgumentValue: station.secondArgumentValue,
                     sourceReservationStation: readyMulDivStation.i,
-                    ticksLeft: 2,
+                    ticksLeft: station.operation == '*' ? 10 : 40,
                     isEmpty: false
                 }
             ]

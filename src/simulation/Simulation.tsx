@@ -142,7 +142,7 @@ export interface SimulatorData {
     // of the current state of the simulator
 
     // The list of instructions to be executed, in order
-    instructionQueue: Instruction[]
+    instructionQueue: Array<Instruction>
 
     // Values in the registers, sorted R0-RN
     registerFile: Array<RegisterData>
@@ -221,30 +221,20 @@ export class Simulation {
     private currentState: SimulatorData = { // TODO
         registerFile: [
             { alias: null, value: 1.2 },
-            { alias: null, value: -10.4 },
-            { alias: 1, value: null },
-            { alias: null, value: -2.6 }
+            { alias: null, value: 4.4 },
+            { alias: null, value: 0 },
+            { alias: null, value: 0 }
         ],
         reservationStations: [
             {
-                operation: '+',
-                firstArgumentValue: 10,
+                operation: null,
+                firstArgumentValue: null,
                 firstArgumentStation: null,
                 firstArgumentWaitingRegister: null,
                 secondArgumentValue: null,
-                secondArgumentStation: 3,
+                secondArgumentStation: null,
                 secondArgumentWaitingRegister: null,
-                isEmpty: false
-            },
-            {
-                operation: '-',
-                firstArgumentValue: null,
-                firstArgumentStation: 0,
-                firstArgumentWaitingRegister: null,
-                secondArgumentValue: null,
-                secondArgumentStation: 3,
-                secondArgumentWaitingRegister: null,
-                isEmpty: false
+                isEmpty: true
             },
             {
                 operation: null,
@@ -257,14 +247,24 @@ export class Simulation {
                 isEmpty: true
             },
             {
-                operation: '*',
-                firstArgumentValue: 10,
+                operation: null,
+                firstArgumentValue: null,
                 firstArgumentStation: null,
                 firstArgumentWaitingRegister: null,
-                secondArgumentValue: 14.6,
+                secondArgumentValue: null,
                 secondArgumentStation: null,
                 secondArgumentWaitingRegister: null,
-                isEmpty: false
+                isEmpty: true
+            },
+            {
+                operation: null,
+                firstArgumentValue: null,
+                firstArgumentStation: null,
+                firstArgumentWaitingRegister: null,
+                secondArgumentValue: null,
+                secondArgumentStation: null,
+                secondArgumentWaitingRegister: null,
+                isEmpty: true
             },
             {
                 operation: null,
@@ -330,11 +330,11 @@ export class Simulation {
                 isEmpty: false
             },
             {
-                addressValue: 67,
+                addressValue: null,
                 addressStation: null,
                 dataValue: null,
-                dataStation: 3,
-                isEmpty: false
+                dataStation: null,
+                isEmpty: true
             },
         ],
         commonDataBus: {
@@ -364,7 +364,33 @@ export class Simulation {
         ],
         adderReservationStationCount: 3,
         multiplierReservationStationCount: 2,
-        clockRate: 2
+        clockRate: 2,
+        instructionQueue: [
+            {
+                opcode: 'MUL',
+                source1: 0,
+                source2: 1,
+                destination: 0
+            },
+            {
+                opcode: 'ADD',
+                source1: 1,
+                source2: 1,
+                destination: 2
+            },
+            {
+                opcode: 'SUB',
+                source1: 1,
+                source2: 2,
+                destination: 2
+            },
+            {
+                opcode: 'DIV',
+                source1: 0,
+                source2: 1,
+                destination: 3
+            }
+        ]
     }
 
     public readonly getSimulatorData = (): SimulatorData => {
