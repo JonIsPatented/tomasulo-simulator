@@ -99,7 +99,7 @@ export type Opcode =
     | 'MUL'
     | 'DIV'
     | 'LD'
-    | 'ST'
+    | 'ST';
 
 export interface Instruction {
     opcode: Opcode
@@ -140,6 +140,9 @@ export interface FunctionUnit {
 export interface SimulatorData {
     // Eventually, this will include a full copy
     // of the current state of the simulator
+
+    // The list of instructions to be executed, in order
+    instructionQueue: Instruction[]
 
     // Values in the registers, sorted R0-RN
     registerFile: Array<RegisterData>
