@@ -6,6 +6,7 @@ import { CommonDataBus } from './commonDataBus'
 import { Flex, Text } from '@radix-ui/themes'
 import { TitleBar } from './TitleBar'
 import { Buffers } from './buffers'
+import { Iqueue } from './Iqueue'
 
 export const MainDiagram = () => {
 
@@ -18,7 +19,7 @@ export const MainDiagram = () => {
                 {/* Instruction Queue */}
                 <div className='col-span-12'>
                     <Section title='Instruction Queue'>
-                        <Text size="2">(TODO)</Text>
+                        <Iqueue/>
                     </Section>
                 </div>
 
