@@ -84,7 +84,8 @@ export const issueStep = (currentState: SimulatorData): SimulatorData => {
         secondArgumentValue: op2.value,
         secondArgumentStation: op2.station,
         secondArgumentWaitingRegister: op2.waitingRegister,
-        isEmpty: false
+        isEmpty: false,
+        isExecuting: false
     }
 
     // Register renaming (only if not store)

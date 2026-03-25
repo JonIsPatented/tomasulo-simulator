@@ -64,20 +64,13 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
 
     const isReady = (station: ReservationStationData) =>
         !station.isEmpty &&
+        !station.isExecuting &&
         station.firstArgumentValue !== null &&
         station.secondArgumentValue !== null
 
     const readyStationsByIndex = resStations.map((station, i) => {
         return { station, i }
     }).filter(stationByIndex => isReady(stationByIndex.station))
-
-    if (readyStationsByIndex.length === 0) {
-        return {
-            ...currentState,
-            reservationStations: resStations,
-            registerFile: regFile
-        }
-    }
 
     const dec = (fu: FunctionUnit) => {
         if (fu.ticksLeft === null) return fu
@@ -87,8 +80,19 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
             ticksLeft: fu.ticksLeft - 1
         }
     }
+
     let addSubFuncUnits = currentState.addSubtractFunctionUnits.map(dec)
     let mulDivFuncUnits = currentState.multiplyDivideFunctionUnits.map(dec)
+
+    if (readyStationsByIndex.length === 0) {
+        return {
+            ...currentState,
+            reservationStations: resStations,
+            registerFile: regFile,
+            addSubtractFunctionUnits: addSubFuncUnits,
+            multiplyDivideFunctionUnits: mulDivFuncUnits
+        }
+    }
 
     if (addSubFuncUnits[0].isEmpty) {
         const readyAddSubStation = readyStationsByIndex.find(
@@ -109,19 +113,15 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
                     isEmpty: false
                 }
             ]
-            resStations = resStations.map((station, i) => {
-                if (i === readyAddSubStation.i)
+
+            resStations = resStations.map((s, i) => {
+                if (i === readyAddSubStation.i) {
                     return {
-                        operation: null,
-                        firstArgumentValue: null,
-                        firstArgumentStation: null,
-                        firstArgumentWaitingRegister: null,
-                        secondArgumentValue: null,
-                        secondArgumentStation: null,
-                        secondArgumentWaitingRegister: null,
-                        isEmpty: true
+                        ...s,
+                        isExecuting: true
                     }
-                return { ...station }
+                }
+                return s
             })
         }
     }
@@ -145,21 +145,16 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
                     isEmpty: false
                 }
             ]
-            resStations = resStations.map((station, i) => {
-                if (i === readyMulDivStation.i)
-                    return {
-                        operation: null,
-                        firstArgumentValue: null,
-                        firstArgumentStation: null,
-                        firstArgumentWaitingRegister: null,
-                        secondArgumentValue: null,
-                        secondArgumentStation: null,
-                        secondArgumentWaitingRegister: null,
-                        isEmpty: true
-                    }
-                return { ...station }
-            })
 
+            resStations = resStations.map((s, i) => {
+                if (i === readyMulDivStation.i) {
+                    return {
+                        ...s,
+                        isExecuting: true
+                    }
+                }
+                return s
+            })
         }
     }
 
