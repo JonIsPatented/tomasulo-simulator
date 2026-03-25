@@ -1,52 +1,52 @@
 import { useSimulation } from '../hooks/useSimulation'
+import { Grid, Text, TextField } from '@radix-ui/themes'
 
 export const RegisterFile = () => {
     const registerFile = useSimulation((data) => data.registerFile)
 
     return (
-        <div className='flex flex-col gap-2'>
+        <Grid columns="3" gap="2" className="items-center text-sm">
 
             {/* Header */}
-            <div className='grid grid-cols-3 text-xs font-semibold opacity-70'>
-                <span>Register</span>
-                <span className='text-center'>Value</span>
-                <span className='text-center'>Tag</span>
-            </div>
+            <Text size="1" weight="bold" color="gray">Register</Text>
+            <Text size="1" weight="bold" align="center" color="gray">Value</Text>
+            <Text size="1" weight="bold" align="center" color="gray">Tag</Text>
 
-            {/* Rows */}
+            {/* Registers */}
             {registerFile.map((reg, i) => {
                 const isWaiting = reg.alias !== null
 
                 return (
-                    <div
-                        key={i}
-                        className={`
-                            grid grid-cols-3 items-center text-sm
-                            py-1 px-2
-                            ${isWaiting ? 'opacity-70 italic' : ''}
-                        `}
-                    >
-                        {/* Register name */}
-                        <span className='font-medium'>
+                    <>
+                        <Text
+                            key={`name-${i}`}
+                            weight="medium"
+                            color={isWaiting ? 'gray' : undefined}
+                            className="whitespace-nowrap border-b border-gray-100 py-1"
+                        >
                             R{i}
-                        </span>
+                        </Text>
 
-                        {/* Value */}
-                        <div className='flex justify-center'>
-                            <input
-                                className='w-20 text-center'
-                                value={reg.value ?? '-'}
-                                readOnly
-                            />
-                        </div>
+                        <TextField.Root
+                            key={`val-${i}`}
+                            size="1"
+                            value={reg.value ?? '-'}
+                            readOnly
+                            className="text-center"
+                        />
 
-                        {/* Tag (alias) */}
-                        <span className='text-center text-xs'>
+                        <Text
+                            key={`tag-${i}`}
+                            align="center"
+                            size="1"
+                            color={isWaiting ? 'gray' : undefined}
+                            className="whitespace-nowrap border-b border-gray-100 py-1"
+                        >
                             {reg.alias !== null ? `RS${reg.alias}` : '-'}
-                        </span>
-                    </div>
+                        </Text>
+                    </>
                 )
             })}
-        </div>
+        </Grid>
     )
 }

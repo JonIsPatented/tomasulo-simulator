@@ -29,6 +29,27 @@ export interface ReservationStationData {
     isEmpty: boolean
 }
 
+export interface LoadStoreBufferData {
+
+    // Memory address if known, or null if still waiting
+    addressValue: number | null
+
+    // Reservation station this address is waiting on,
+    // or null if not waiting
+    addressStation: number | null
+
+    // Value to store.
+    // This can be null if it's a load buffer
+    dataValue: number | null
+
+    // Reservation station this data is waiting on,
+    // or null if not waiting
+    dataStation: number | null
+
+    // Whether this buffer is empty
+    isEmpty: boolean
+}
+
 export interface RegisterData {
     // Alias for this register (to a reservation station),
     // with a number indicating the index of the corresponding
@@ -49,6 +70,12 @@ export interface SimulatorData {
     // Values in the reservation stations, sorted
     // from RS0-RSN
     reservationStations: Array<ReservationStationData>
+
+    // Load buffers
+    loadBuffers: Array<LoadStoreBufferData>,
+
+    // Store buffers
+    storeBuffers: Array<LoadStoreBufferData>
 
     // Number of adder reservation stations
     adderReservationStationCount: number
@@ -149,6 +176,66 @@ export class Simulation {
                 isEmpty: true
             },
         ],
+        loadBuffers: [
+            {
+                addressValue: null,
+                addressStation: null,
+                dataValue: null,
+                dataStation: null,
+                isEmpty: false
+            },
+            {
+                addressValue: null,
+                addressStation: null,
+                dataValue: null,
+                dataStation: null,
+                isEmpty: false
+            },
+            {
+                addressValue: null,
+                addressStation: null,
+                dataValue: null,
+                dataStation: null,
+                isEmpty: false
+            },
+            {
+                addressValue: null,
+                addressStation: null,
+                dataValue: null,
+                dataStation: null,
+                isEmpty: false
+            },
+        ],
+        storeBuffers: [
+            {
+                addressValue: null,
+                addressStation: null,
+                dataValue: null,
+                dataStation: null,
+                isEmpty: false
+            },
+            {
+                addressValue: null,
+                addressStation: null,
+                dataValue: null,
+                dataStation: null,
+                isEmpty: false
+            },
+            {
+                addressValue: null,
+                addressStation: null,
+                dataValue: null,
+                dataStation: null,
+                isEmpty: false
+            },
+            {
+                addressValue: 67,
+                addressStation: null,
+                dataValue: null,
+                dataStation: 3,
+                isEmpty: false
+            },
+        ],
         adderReservationStationCount: 3,
         multiplierReservationStationCount: 2,
         clockRate: 2
@@ -188,23 +275,29 @@ export class Simulation {
     }
 
     private readonly tick = () => { // TODO
-        // Replace currentState with a perfect
-        // copy but with 0.5 added to R0
-        this.currentState = {
-            ...this.currentState,
-            registerFile: this.currentState.registerFile.map(
-                (register, i) => {
-                    if (i == 0) {
-                        return {
-                            ...register,
-                            value: register.value !== null ?
-                                register.value + 0.5 : null
-                        }
-                    }
-                    return register
-                }
-            )
-        }
+        this.currentState = [this.currentState]
+            .map(placeholderStep)
+            .map(data => data)[0]
     }
-
 }
+
+const placeholderStep = (data: SimulatorData) => {
+    // Replace currentState with a perfect
+    // copy but with 0.5 added to R0
+    return {
+        ...data,
+        registerFile: data.registerFile.map(
+            (register, i) => {
+                if (i == 0) {
+                    return {
+                        ...register,
+                        value: register.value !== null ?
+                            register.value + 0.5 : null
+                    }
+                }
+                return register
+            }
+        )
+    }
+}
+
