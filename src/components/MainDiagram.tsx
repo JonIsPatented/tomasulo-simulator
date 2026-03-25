@@ -5,6 +5,7 @@ import { useSimulation } from '../hooks/useSimulation'
 import { Simulation } from '../simulation/Simulation'
 import {Buffers} from './buffers'
 import { Button, Flex, Text, Heading } from '@radix-ui/themes'
+import { Iqueue } from './Iqueue'
 
 export const MainDiagram = () => {
     const clockRate = useSimulation((data) => data.clockRate)
@@ -40,7 +41,7 @@ export const MainDiagram = () => {
                 {/* Instruction Queue */}
                 <div className='col-span-12'>
                     <Section title='Instruction Queue'>
-                        <Text size="2">(TODO)</Text>
+                        <Iqueue/>
                     </Section>
                 </div>
 
