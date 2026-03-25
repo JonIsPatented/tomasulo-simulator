@@ -2,6 +2,10 @@ import { Section } from './Section'
 import { RegisterFile } from './RegisterFile'
 import { FuncUnits } from './funcUnits'
 import { ReservationStations } from './ReservationStations'
+
+import { TitleBar } from './TitleBar'
+import { Flex, Text } from '@radix-ui/themes'
+
 import { useSimulation } from '../hooks/useSimulation'
 import { Simulation } from '../simulation/Simulation'
 import {Buffers} from './buffers'
@@ -9,36 +13,13 @@ import { Button, Flex, Text, Heading } from '@radix-ui/themes'
 import { Iqueue } from './Iqueue'
 
 export const MainDiagram = () => {
-    const clockRate = useSimulation((data) => data.clockRate)
-    const simulation = Simulation.getSimulation()
 
     return (
         <div className='h-full p-4'>
             <div className='grid grid-cols-12 gap-4 auto-rows-auto'>
 
                 {/* Controls */}
-                <div className='col-span-12'>
-                    <Flex justify="between" align="center">
-                        <Heading size="4">
-                            Tomasulo Simulator
-                        </Heading>
-
-                        <Flex gap="2" align="center">
-                            <Button onClick={simulation.startClock} variant="outline">
-                                Start
-                            </Button>
-
-                            <Button onClick={simulation.stopClock} variant="outline">
-                                Stop
-                            </Button>
-
-                            <Text size="2">
-                                {clockRate} ticks/sec
-                            </Text>
-                        </Flex>
-                    </Flex>
-                </div>
-
+                <TitleBar />
                 {/* Instruction Queue */}
                 <div className='col-span-12'>
                     <Section title='Instruction Queue'>
