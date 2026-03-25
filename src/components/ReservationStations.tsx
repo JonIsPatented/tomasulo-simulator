@@ -50,14 +50,17 @@ const RSRow = ({
     const status =
         rs.isEmpty
             ? 'Free'
-            : (rs.firstArgumentValue !== null && rs.secondArgumentValue !== null)
-                ? 'Ready'
-                : 'Waiting'
+            : (rs.isExecuting)
+                ? 'Running'
+                : (rs.firstArgumentValue !== null && rs.secondArgumentValue !== null)
+                    ? 'Ready'
+                    : 'Waiting'
 
     const color =
         status === 'Waiting' ? 'amber' :
             status === 'Ready' ? 'green' :
-                'gray'
+                status === 'Running' ? 'blue' :
+                    'gray'
 
     return (
         <>

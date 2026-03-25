@@ -440,5 +440,7 @@ export class Simulation {
             .map(issueStep)
             .map(dispatchStep)
             .map(broadcastStep)[0]
+        console.log(this.currentState.commonDataBus)
+        console.log(this.currentState.addSubtractFunctionUnits)
     }
 }
