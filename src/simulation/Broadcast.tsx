@@ -119,7 +119,8 @@ export const broadcastStep = (currentState: SimulatorData) => {
                         secondArgumentValue: null,
                         secondArgumentStation: null,
                         secondArgumentWaitingRegister: null,
-                        isEmpty: true
+                        isEmpty: true,
+                        isExecuting: false
                     }
                 }
                 return station
