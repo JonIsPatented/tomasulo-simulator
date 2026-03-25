@@ -9,9 +9,22 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
 
     if (bus.value !== null) {
         if (bus.sourceStation !== null) {
-            resStations = resStations.map((station) => {
+            resStations = resStations.map((station, i) => {
                 const firstFromStation = station.firstArgumentStation === bus.sourceStation
                 const secondFromStation = station.secondArgumentStation === bus.sourceStation
+
+                if (i === bus.sourceStation)
+                    return {
+                        operation: null,
+                        firstArgumentValue: null,
+                        firstArgumentStation: null,
+                        firstArgumentWaitingRegister: null,
+                        secondArgumentValue: null,
+                        secondArgumentStation: null,
+                        secondArgumentWaitingRegister: null,
+                        isEmpty: true,
+                        isExecuting: false,
+                    }
 
                 return {
                     ...station,
@@ -116,6 +129,7 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
 
             resStations = resStations.map((s, i) => {
                 if (i === readyAddSubStation.i) {
+                    console.log("MARKED AS EXECUTING")
                     return {
                         ...s,
                         isExecuting: true
@@ -157,6 +171,7 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
             })
         }
     }
+
 
     return {
         ...currentState,

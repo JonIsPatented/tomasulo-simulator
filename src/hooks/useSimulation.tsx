@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { Simulation, type SimulatorData } from '../simulation/Simulation'
-import isEqual from 'react-fast-compare'
 
 type Narrower<T> = (data: SimulatorData) => T
 
@@ -16,7 +15,6 @@ export const useSimulation = <T,>(narrower: Narrower<T>) => {
 
         const subscriber = (simData: SimulatorData) => {
             const newData = narrower(simData)
-            if (isEqual(data, newData)) return
             setData(newData)
         }
 
