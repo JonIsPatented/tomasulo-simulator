@@ -3,7 +3,7 @@ import { RegisterFile } from './RegisterFile'
 import { ReservationStations } from './ReservationStations'
 import { useSimulation } from '../hooks/useSimulation'
 import { Simulation } from '../simulation/Simulation'
-
+import {Buffers} from './buffers'
 import { Button, Flex, Text, Heading } from '@radix-ui/themes'
 
 export const MainDiagram = () => {
@@ -61,7 +61,7 @@ export const MainDiagram = () => {
                 {/* Load / Store Buffers */}
                 <div className='col-span-3'>
                     <Section title='Load / Store Buffers'>
-                        <Text size="2">(TODO)</Text>
+                        <Buffers />
                     </Section>
                 </div>
 
