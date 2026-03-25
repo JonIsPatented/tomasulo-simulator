@@ -18,6 +18,12 @@ export interface ReservationStationData {
     // is empty
     firstArgumentStation: number | null
 
+    // The index of the register the first argument
+    // is awaiting, or null if the argument is not
+    // awaiting a register load or if this station
+    // is empty
+    firstArgumentWaitingRegister: number | null
+
     // The value of the second argument, or null if
     // the argument is awaiting another station or
     // if this station is empty
@@ -28,6 +34,12 @@ export interface ReservationStationData {
     // awaiting another station or if this station
     // is empty
     secondArgumentStation: number | null
+
+    // The index of the register the second argument
+    // is awaiting, or null if the argument is not
+    // awaiting a register load or if this station
+    // is empty
+    secondArgumentWaitingRegister: number | null
 
     // Whether this station is empty
     isEmpty: boolean
@@ -200,40 +212,50 @@ export class Simulation {
                 operation: '+',
                 firstArgumentValue: 10,
                 firstArgumentStation: null,
+                firstArgumentWaitingRegister: null,
                 secondArgumentValue: null,
                 secondArgumentStation: 3,
+                secondArgumentWaitingRegister: null,
                 isEmpty: false
             },
             {
                 operation: '-',
                 firstArgumentValue: null,
                 firstArgumentStation: 0,
+                firstArgumentWaitingRegister: null,
                 secondArgumentValue: null,
                 secondArgumentStation: 3,
+                secondArgumentWaitingRegister: null,
                 isEmpty: false
             },
             {
                 operation: null,
                 firstArgumentValue: null,
                 firstArgumentStation: null,
+                firstArgumentWaitingRegister: null,
                 secondArgumentValue: null,
                 secondArgumentStation: null,
+                secondArgumentWaitingRegister: null,
                 isEmpty: true
             },
             {
                 operation: '*',
                 firstArgumentValue: 10,
                 firstArgumentStation: null,
+                firstArgumentWaitingRegister: null,
                 secondArgumentValue: 14.6,
                 secondArgumentStation: null,
+                secondArgumentWaitingRegister: null,
                 isEmpty: false
             },
             {
                 operation: null,
                 firstArgumentValue: null,
                 firstArgumentStation: null,
+                firstArgumentWaitingRegister: null,
                 secondArgumentValue: null,
                 secondArgumentStation: null,
+                secondArgumentWaitingRegister: null,
                 isEmpty: true
             },
         ],
