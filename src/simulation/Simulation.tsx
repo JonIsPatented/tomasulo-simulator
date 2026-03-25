@@ -372,7 +372,7 @@ export class Simulation {
         ],
         adderReservationStationCount: 3,
         multiplierReservationStationCount: 2,
-        clockRate: 2,
+        clockRate: 4,
         instructionQueue: [
             {
                 opcode: 'MUL',
