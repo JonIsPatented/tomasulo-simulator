@@ -5,6 +5,7 @@ import { CommonDataBus } from './commonDataBus'
 
 import { Flex, Text } from '@radix-ui/themes'
 import { TitleBar } from './TitleBar'
+import { Buffers } from './buffers'
 
 export const MainDiagram = () => {
 
@@ -38,7 +39,7 @@ export const MainDiagram = () => {
                 {/* Load / Store Buffers */}
                 <div className='col-span-3'>
                     <Section title='Load / Store Buffers'>
-                        <Text size="2">(TODO)</Text>
+                        <Buffers />
                     </Section>
                 </div>
 
