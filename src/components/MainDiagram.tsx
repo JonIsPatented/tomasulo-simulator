@@ -3,6 +3,7 @@ import { RegisterFile } from './RegisterFile'
 import { ReservationStations } from './ReservationStations'
 import { useSimulation } from '../hooks/useSimulation'
 import { Simulation } from '../simulation/Simulation'
+import { CommonDataBus } from './commonDataBus'
 
 import { Button, Flex, Text, Heading } from '@radix-ui/themes'
 
@@ -75,9 +76,7 @@ export const MainDiagram = () => {
                 {/* Common Data Bus */}
                 <div className='col-span-12'>
                     <Flex justify='center'>
-                        <Text weight="medium">
-                            Common Data Bus (TODO)
-                        </Text>
+                        <CommonDataBus/>
                     </Flex>
                 </div>
 
