@@ -43,6 +43,9 @@ export interface ReservationStationData {
 
     // Whether this station is empty
     isEmpty: boolean
+
+    // Whether this station is executing
+    isExecuting: boolean
 }
 
 export interface LoadStoreBufferData {
@@ -234,7 +237,8 @@ export class Simulation {
                 secondArgumentValue: null,
                 secondArgumentStation: null,
                 secondArgumentWaitingRegister: null,
-                isEmpty: true
+                isEmpty: true,
+                isExecuting: false
             },
             {
                 operation: null,
@@ -244,7 +248,8 @@ export class Simulation {
                 secondArgumentValue: null,
                 secondArgumentStation: null,
                 secondArgumentWaitingRegister: null,
-                isEmpty: true
+                isEmpty: true,
+                isExecuting: false
             },
             {
                 operation: null,
@@ -254,7 +259,8 @@ export class Simulation {
                 secondArgumentValue: null,
                 secondArgumentStation: null,
                 secondArgumentWaitingRegister: null,
-                isEmpty: true
+                isEmpty: true,
+                isExecuting: false
             },
             {
                 operation: null,
@@ -264,7 +270,8 @@ export class Simulation {
                 secondArgumentValue: null,
                 secondArgumentStation: null,
                 secondArgumentWaitingRegister: null,
-                isEmpty: true
+                isEmpty: true,
+                isExecuting: false
             },
             {
                 operation: null,
@@ -274,7 +281,8 @@ export class Simulation {
                 secondArgumentValue: null,
                 secondArgumentStation: null,
                 secondArgumentWaitingRegister: null,
-                isEmpty: true
+                isEmpty: true,
+                isExecuting: false
             },
         ],
         loadBuffers: [

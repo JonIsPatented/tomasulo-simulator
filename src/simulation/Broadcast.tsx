@@ -66,7 +66,23 @@ export const broadcastStep = (currentState: SimulatorData) => {
                     sourceReservationStation: null,
                     isEmpty: true
                 }
-            ]
+            ],
+            reservationStations: currentState.reservationStations.map((station, i) => {
+                if (i === multiplyFunctionUnit.sourceReservationStation) {
+                    return {
+                        operation: null,
+                        firstArgumentValue: null,
+                        firstArgumentStation: null,
+                        firstArgumentWaitingRegister: null,
+                        secondArgumentValue: null,
+                        secondArgumentStation: null,
+                        secondArgumentWaitingRegister: null,
+                        isEmpty: true,
+                        isExecuting: false
+                    }
+                }
+                return station
+            })
         }
     }
 
@@ -92,7 +108,22 @@ export const broadcastStep = (currentState: SimulatorData) => {
                     sourceReservationStation: null,
                     isEmpty: true
                 }
-            ]
+            ],
+            reservationStations: currentState.reservationStations.map((station, i) => {
+                if (i === addFunctionUnit.sourceReservationStation) {
+                    return {
+                        operation: null,
+                        firstArgumentValue: null,
+                        firstArgumentStation: null,
+                        firstArgumentWaitingRegister: null,
+                        secondArgumentValue: null,
+                        secondArgumentStation: null,
+                        secondArgumentWaitingRegister: null,
+                        isEmpty: true
+                    }
+                }
+                return station
+            })
 
         }
     }
