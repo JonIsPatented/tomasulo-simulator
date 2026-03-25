@@ -5,9 +5,9 @@ export const CommonDataBus =()  => {
     const CDB = useSimulation ((data) => data.commonDataBus)
     return(
         <Flex direction="row" gap="2">
-            <div>{CDB.sourceStation}</div>
-            <div>{CDB.value}</div>
-            <div>{CDB.destinationRegister}</div>
+            <div>{CDB.sourceStation??'-'}</div>
+            <div>{CDB.value??'-'}</div>
+            <div>{CDB.destinationRegister??'-'}</div>
         </Flex>
     )
 }
