@@ -93,6 +93,21 @@ export interface DataBus {
     destinationRegister: number | null
 }
 
+export type Opcode =
+    | 'ADD'
+    | 'SUB'
+    | 'MUL'
+    | 'DIV'
+    | 'LD'
+    | 'ST'
+
+export interface Instruction {
+    opcode: Opcode
+    destination: number
+    source1: number
+    source2: number
+}
+
 export interface FunctionUnit {
     // Which operation is being performed in this station
     // or null if the station is empty
