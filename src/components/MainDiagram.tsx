@@ -8,6 +8,8 @@ import { Flex, Text } from '@radix-ui/themes'
 
 import { useSimulation } from '../hooks/useSimulation'
 import { Simulation } from '../simulation/Simulation'
+import { CommonDataBus } from './commonDataBus'
+
 import {Buffers} from './buffers'
 import { Button, Flex, Text, Heading } from '@radix-ui/themes'
 import { Iqueue } from './Iqueue'
@@ -58,9 +60,7 @@ export const MainDiagram = () => {
                 {/* Common Data Bus */}
                 <div className='col-span-12'>
                     <Flex justify='center'>
-                        <Text weight="medium">
-                            Common Data Bus (TODO)
-                        </Text>
+                        <CommonDataBus/>
                     </Flex>
                 </div>
 
