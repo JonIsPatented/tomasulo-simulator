@@ -1,3 +1,7 @@
+import { broadcastStep } from './Broadcast.tsx'
+import { dispatchStep } from './Dispatch.tsx'
+import { issueStep } from './Issue.tsx'
+
 export interface ReservationStationData {
     // Which operation is being performed in this station
     // or null if the station is empty
@@ -14,6 +18,12 @@ export interface ReservationStationData {
     // is empty
     firstArgumentStation: number | null
 
+    // The index of the register the first argument
+    // is awaiting, or null if the argument is not
+    // awaiting a register load or if this station
+    // is empty
+    firstArgumentWaitingRegister: number | null
+
     // The value of the second argument, or null if
     // the argument is awaiting another station or
     // if this station is empty
@@ -25,8 +35,17 @@ export interface ReservationStationData {
     // is empty
     secondArgumentStation: number | null
 
+    // The index of the register the second argument
+    // is awaiting, or null if the argument is not
+    // awaiting a register load or if this station
+    // is empty
+    secondArgumentWaitingRegister: number | null
+
     // Whether this station is empty
     isEmpty: boolean
+
+    // Whether this station is executing
+    isExecuting: boolean
 }
 
 export interface LoadStoreBufferData {
@@ -60,9 +79,73 @@ export interface RegisterData {
     value: number | null
 }
 
+export interface DataBus {
+    // The value being broadcast. Null if no value
+    // is being broadcast at the moment.
+    value: number | null
+
+    // The index of the reservation station corresponding
+    // to the operation that produced this value, or null
+    // if the bus is off or the data is from memory rather
+    // than from a function unit
+    sourceStation: number | null
+
+    // The index of the register the load operation
+    // is writing to, or null if data bus is off or
+    // if the data is not from memory
+    destinationRegister: number | null
+}
+
+export type Opcode =
+    | 'ADD'
+    | 'SUB'
+    | 'MUL'
+    | 'DIV'
+    | 'LD'
+    | 'ST';
+
+export interface Instruction {
+    opcode: Opcode
+    destination: number
+    source1: number
+    source2: number
+}
+
+export interface FunctionUnit {
+    // Which operation is being performed in this station
+    // or null if the station is empty
+    operation: '+' | '-' | '*' | '/' | null
+
+    // The value of the first argument, or null if
+    // the argument is awaiting another station or
+    // if this station is empty
+    firstArgumentValue: number | null
+
+    // The value of the second argument, or null if
+    // the argument is awaiting another station or
+    // if this station is empty
+    secondArgumentValue: number | null
+
+    // The number of cycles left in the current function
+    // execution for this unit, or null if no operation
+    // is in progress
+    ticksLeft: number | null
+
+    // The index of the reservation station that this
+    // operation was dispatched from, or null if no
+    // operation is in progress
+    sourceReservationStation: number | null
+
+    // Whether this station is empty
+    isEmpty: boolean
+}
+
 export interface SimulatorData {
     // Eventually, this will include a full copy
     // of the current state of the simulator
+
+    // The list of instructions to be executed, in order
+    instructionQueue: Array<Instruction>
 
     // Values in the registers, sorted R0-RN
     registerFile: Array<RegisterData>
@@ -82,6 +165,17 @@ export interface SimulatorData {
 
     // Number of multiplier reservation stations
     multiplierReservationStationCount: number
+
+    // Common data bus for broadcast data
+    commonDataBus: DataBus
+
+    // Adders/subtractors for operation on values in
+    // the add/sub reservation stations
+    addSubtractFunctionUnits: Array<FunctionUnit>
+
+    // multipliers/dividers for operation on values in
+    // the mul/div reservation stations
+    multiplyDivideFunctionUnits: Array<FunctionUnit>
 
     // Clock rate of the simulation, measured
     // in ticks per second
@@ -130,50 +224,65 @@ export class Simulation {
     private currentState: SimulatorData = { // TODO
         registerFile: [
             { alias: null, value: 1.2 },
-            { alias: null, value: -10.4 },
-            { alias: 1, value: null },
-            { alias: null, value: -2.6 }
+            { alias: null, value: 4.4 },
+            { alias: null, value: 0 },
+            { alias: null, value: 0 }
         ],
         reservationStations: [
             {
-                operation: '+',
-                firstArgumentValue: 10,
-                firstArgumentStation: null,
-                secondArgumentValue: null,
-                secondArgumentStation: 3,
-                isEmpty: false
-            },
-            {
-                operation: '-',
+                operation: null,
                 firstArgumentValue: null,
-                firstArgumentStation: 0,
+                firstArgumentStation: null,
+                firstArgumentWaitingRegister: null,
                 secondArgumentValue: null,
-                secondArgumentStation: 3,
-                isEmpty: false
+                secondArgumentStation: null,
+                secondArgumentWaitingRegister: null,
+                isEmpty: true,
+                isExecuting: false
             },
             {
                 operation: null,
                 firstArgumentValue: null,
                 firstArgumentStation: null,
+                firstArgumentWaitingRegister: null,
                 secondArgumentValue: null,
                 secondArgumentStation: null,
-                isEmpty: true
-            },
-            {
-                operation: '*',
-                firstArgumentValue: 10,
-                firstArgumentStation: null,
-                secondArgumentValue: 14.6,
-                secondArgumentStation: null,
-                isEmpty: false
+                secondArgumentWaitingRegister: null,
+                isEmpty: true,
+                isExecuting: false
             },
             {
                 operation: null,
                 firstArgumentValue: null,
                 firstArgumentStation: null,
+                firstArgumentWaitingRegister: null,
                 secondArgumentValue: null,
                 secondArgumentStation: null,
-                isEmpty: true
+                secondArgumentWaitingRegister: null,
+                isEmpty: true,
+                isExecuting: false
+            },
+            {
+                operation: null,
+                firstArgumentValue: null,
+                firstArgumentStation: null,
+                firstArgumentWaitingRegister: null,
+                secondArgumentValue: null,
+                secondArgumentStation: null,
+                secondArgumentWaitingRegister: null,
+                isEmpty: true,
+                isExecuting: false
+            },
+            {
+                operation: null,
+                firstArgumentValue: null,
+                firstArgumentStation: null,
+                firstArgumentWaitingRegister: null,
+                secondArgumentValue: null,
+                secondArgumentStation: null,
+                secondArgumentWaitingRegister: null,
+                isEmpty: true,
+                isExecuting: false
             },
         ],
         loadBuffers: [
@@ -190,7 +299,7 @@ export class Simulation {
                 dataValue: null,
                 dataStation: null,
                 isEmpty: false
-            },            
+            },
             {
                 addressValue: null,
                 addressStation: null,
@@ -229,16 +338,67 @@ export class Simulation {
                 isEmpty: false
             },
             {
-                addressValue: 67,
+                addressValue: null,
                 addressStation: null,
                 dataValue: null,
-                dataStation: 3,
-                isEmpty: false
+                dataStation: null,
+                isEmpty: true
             },
+        ],
+        commonDataBus: {
+            value: null,
+            sourceStation: null,
+            destinationRegister: null
+        },
+        addSubtractFunctionUnits: [
+            {
+                operation: null,
+                firstArgumentValue: null,
+                secondArgumentValue: null,
+                ticksLeft: null,
+                sourceReservationStation: null,
+                isEmpty: true
+            }
+        ],
+        multiplyDivideFunctionUnits: [
+            {
+                operation: null,
+                firstArgumentValue: null,
+                secondArgumentValue: null,
+                ticksLeft: null,
+                sourceReservationStation: null,
+                isEmpty: true
+            }
         ],
         adderReservationStationCount: 3,
         multiplierReservationStationCount: 2,
-        clockRate: 2
+        clockRate: 4,
+        instructionQueue: [
+            {
+                opcode: 'MUL',
+                source1: 0,
+                source2: 1,
+                destination: 0
+            },
+            {
+                opcode: 'ADD',
+                source1: 1,
+                source2: 1,
+                destination: 2
+            },
+            {
+                opcode: 'SUB',
+                source1: 1,
+                source2: 2,
+                destination: 2
+            },
+            {
+                opcode: 'DIV',
+                source1: 0,
+                source2: 1,
+                destination: 3
+            }
+        ]
     }
 
     public readonly getSimulatorData = (): SimulatorData => {
@@ -275,24 +435,10 @@ export class Simulation {
         this.publish()
     }
 
-    private readonly tick = () => { // TODO
-        // Replace currentState with a perfect
-        // copy but with 0.5 added to R0
-        this.currentState = {
-            ...this.currentState,
-            registerFile: this.currentState.registerFile.map(
-                (register, i) => {
-                    if (i == 0) {
-                        return {
-                            ...register,
-                            value: register.value !== null ?
-                                register.value + 0.5 : null
-                        }
-                    }
-                    return register
-                }
-            )
-        }
+    private readonly tick = () => {
+        this.currentState = [this.currentState]
+            .map(issueStep)
+            .map(dispatchStep)
+            .map(broadcastStep)[0]
     }
-
 }

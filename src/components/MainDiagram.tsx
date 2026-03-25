@@ -1,8 +1,16 @@
 import { Section } from './Section'
 import { RegisterFile } from './RegisterFile'
+import { FuncUnits } from './funcUnits'
 import { ReservationStations } from './ReservationStations'
+
 import { TitleBar } from './TitleBar'
 import { Flex, Text } from '@radix-ui/themes'
+
+import { useSimulation } from '../hooks/useSimulation'
+import { Simulation } from '../simulation/Simulation'
+import {Buffers} from './buffers'
+import { Button, Flex, Text, Heading } from '@radix-ui/themes'
+import { Iqueue } from './Iqueue'
 
 export const MainDiagram = () => {
 
@@ -15,7 +23,7 @@ export const MainDiagram = () => {
                 {/* Instruction Queue */}
                 <div className='col-span-12'>
                     <Section title='Instruction Queue'>
-                        <Text size="2">(TODO)</Text>
+                        <Iqueue/>
                     </Section>
                 </div>
 
@@ -36,14 +44,14 @@ export const MainDiagram = () => {
                 {/* Load / Store Buffers */}
                 <div className='col-span-3'>
                     <Section title='Load / Store Buffers'>
-                        <Text size="2">(TODO)</Text>
+                        <Buffers />
                     </Section>
                 </div>
 
                 {/* Functional Units */}
                 <div className='col-span-6 col-start-4'>
                     <Section title='Functional Units'>
-                        <Text size="2">(TODO)</Text>
+                        <FuncUnits />
                     </Section>
                 </div>
 
