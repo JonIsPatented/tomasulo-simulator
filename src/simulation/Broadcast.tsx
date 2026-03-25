@@ -45,11 +45,7 @@ export const broadcastStep = (currentState: SimulatorData) => {
     const addFunctionUnit = currentState.addSubtractFunctionUnits[0];
 
     // Checks if the mul / div function unit is done
-    if (
-        multiplyFunctionUnit &&
-        !multiplyFunctionUnit.isEmpty &&
-        multiplyFunctionUnit.ticksLeft === 0
-    ) {
+    if (multiplyFunctionUnit.ticksLeft === 0) {
         return {
             ...currentState,
             commonDataBus: {
@@ -65,11 +61,7 @@ export const broadcastStep = (currentState: SimulatorData) => {
     }
 
     // Checks if the add / sub function unit is done
-    if (
-        addFunctionUnit &&
-        !addFunctionUnit.isEmpty &&
-        addFunctionUnit.ticksLeft === 0
-    ) {
+    if (addFunctionUnit.ticksLeft === 0) {
         return {
             ...currentState,
             commonDataBus: {
