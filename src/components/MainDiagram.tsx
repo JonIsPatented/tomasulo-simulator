@@ -1,16 +1,15 @@
 import { Section } from './Section'
 import { RegisterFile } from './RegisterFile'
-import { FuncUnits } from './funcUnits'
+import { FuncUnits } from './FuncUnits'
 import { ReservationStations } from './ReservationStations'
-
-import { TitleBar } from './TitleBar'
-import { Flex, Text } from '@radix-ui/themes'
 
 import { useSimulation } from '../hooks/useSimulation'
 import { Simulation } from '../simulation/Simulation'
-import { CommonDataBus } from './commonDataBus'
 
-import {Buffers} from './buffers'
+import { TitleBar } from './TitleBar'
+import { CommonDataBus } from './CommonDataBus'
+
+import { Buffers } from './Buffers'
 import { Button, Flex, Text, Heading } from '@radix-ui/themes'
 import { Iqueue } from './Iqueue'
 
@@ -25,7 +24,7 @@ export const MainDiagram = () => {
                 {/* Instruction Queue */}
                 <div className='col-span-12'>
                     <Section title='Instruction Queue'>
-                        <Iqueue/>
+                        <Iqueue />
                     </Section>
                 </div>
 
@@ -60,7 +59,7 @@ export const MainDiagram = () => {
                 {/* Common Data Bus */}
                 <div className='col-span-12'>
                     <Flex justify='center'>
-                        <CommonDataBus/>
+                        <CommonDataBus />
                     </Flex>
                 </div>
 
