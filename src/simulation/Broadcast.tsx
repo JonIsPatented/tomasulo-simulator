@@ -1,4 +1,4 @@
-import type { SimulatorData } from "./Simulation";
+import type { SimulatorData } from "./Simulation"
 
 // ⋆.˚⟡ ࣪ ˖ MEMORY IS A LIE ⋆.˚⟡ ࣪ ˖
 // for now...
@@ -8,8 +8,8 @@ const emptyBus = () => {
         value: null,
         sourceStation: null,
         destinationRegister: null
-    };
-};
+    }
+}
 
 // Computes the result for each type of operation
 // Currently does not support load / store
@@ -23,26 +23,26 @@ const computeResult = (
         firstArgumentValue === null ||
         secondArgumentValue === null
     ) {
-        return null;
+        return null
     }
 
     switch (operation) {
         case '+':
-            return firstArgumentValue + secondArgumentValue;
+            return firstArgumentValue + secondArgumentValue
         case '-':
-            return firstArgumentValue - secondArgumentValue;
+            return firstArgumentValue - secondArgumentValue
         case '*':
-            return firstArgumentValue * secondArgumentValue;
+            return firstArgumentValue * secondArgumentValue
         case '/':
-            return secondArgumentValue === 0 ? NaN : firstArgumentValue / secondArgumentValue;
+            return secondArgumentValue === 0 ? NaN : firstArgumentValue / secondArgumentValue
         default:
-            return null;
+            return null
     }
-};
+}
 
 export const broadcastStep = (currentState: SimulatorData) => {
-    const multiplyFunctionUnit = currentState.multiplyDivideFunctionUnits[0];
-    const addFunctionUnit = currentState.addSubtractFunctionUnits[0];
+    const multiplyFunctionUnit = currentState.multiplyDivideFunctionUnits[0]
+    const addFunctionUnit = currentState.addSubtractFunctionUnits[0]
 
     // Checks if the mul / div function unit is done
     if (multiplyFunctionUnit.ticksLeft === 0) {
@@ -56,8 +56,18 @@ export const broadcastStep = (currentState: SimulatorData) => {
                 ),
                 sourceStation: multiplyFunctionUnit.sourceReservationStation,
                 destinationRegister: null
-            }
-        };
+            },
+            multiplyDivideFunctionUnits: [
+                {
+                    operation: null,
+                    firstArgumentValue: null,
+                    secondArgumentValue: null,
+                    ticksLeft: null,
+                    sourceReservationStation: null,
+                    isEmpty: true
+                }
+            ]
+        }
     }
 
     // Checks if the add / sub function unit is done
@@ -72,12 +82,23 @@ export const broadcastStep = (currentState: SimulatorData) => {
                 ),
                 sourceStation: addFunctionUnit.sourceReservationStation,
                 destinationRegister: null
-            }
-        };
+            },
+            addSubtractFunctionUnits: [
+                {
+                    operation: null,
+                    firstArgumentValue: null,
+                    secondArgumentValue: null,
+                    ticksLeft: null,
+                    sourceReservationStation: null,
+                    isEmpty: true
+                }
+            ]
+
+        }
     }
 
     return {
         ...currentState,
         commonDataBus: emptyBus()
-    };
-};
+    }
+}
