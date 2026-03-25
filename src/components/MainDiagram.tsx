@@ -1,5 +1,6 @@
 import { Section } from './Section'
 import { RegisterFile } from './RegisterFile'
+import { FuncUnits } from './funcUnits'
 import { ReservationStations } from './ReservationStations'
 import { CommonDataBus } from './commonDataBus'
 
@@ -47,7 +48,7 @@ export const MainDiagram = () => {
                 {/* Functional Units */}
                 <div className='col-span-6 col-start-4'>
                     <Section title='Functional Units'>
-                        <Text size="2">(TODO)</Text>
+                        <FuncUnits />
                     </Section>
                 </div>
 
