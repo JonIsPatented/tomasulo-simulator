@@ -3,15 +3,12 @@ import { RegisterFile } from './RegisterFile'
 import { FuncUnits } from './FuncUnits'
 import { ReservationStations } from './ReservationStations'
 
-import { useSimulation } from '../hooks/useSimulation'
-import { Simulation } from '../simulation/Simulation'
-
 import { TitleBar } from './TitleBar'
 import { CommonDataBus } from './CommonDataBus'
 
 import { Buffers } from './Buffers'
-import { Button, Flex, Text, Heading } from '@radix-ui/themes'
-import { Iqueue } from './Iqueue'
+import { Flex } from '@radix-ui/themes'
+import { InstructionQueue } from './InstructionQueue'
 
 export const MainDiagram = () => {
 
@@ -20,11 +17,13 @@ export const MainDiagram = () => {
             <div className='grid grid-cols-12 gap-4 auto-rows-auto'>
 
                 {/* Controls */}
-                <TitleBar />
+                <div className='col-span-12'>
+                    <TitleBar />
+                </div>
                 {/* Instruction Queue */}
                 <div className='col-span-12'>
                     <Section title='Instruction Queue'>
-                        <Iqueue />
+                        <InstructionQueue />
                     </Section>
                 </div>
 

@@ -411,7 +411,6 @@ export class Simulation {
         })
     }
 
-    private clockRatePerSecond: number = 1
     private timerId: ReturnType<typeof setInterval> | null = null
 
     public readonly startClock = () => {
@@ -419,7 +418,7 @@ export class Simulation {
         this.timerId = setInterval(() => {
             this.tick()
             this.publish()
-        }, 1000 / this.clockRatePerSecond)
+        }, 1000 / this.currentState.clockRate)
     }
 
     public readonly stopClock = () => {
@@ -430,7 +429,7 @@ export class Simulation {
     public readonly setClockRate = (newRatePerSecond: number) => {
         const wasRunning: boolean = !!this.timerId
         this.stopClock()
-        this.clockRatePerSecond = newRatePerSecond
+        this.currentState.clockRate = newRatePerSecond
         if (wasRunning) this.startClock()
         this.publish()
     }
