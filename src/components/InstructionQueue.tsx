@@ -1,7 +1,7 @@
 import { Flex } from "@radix-ui/themes"
 import { useSimulation } from "../hooks/useSimulation"
 
-export const Iqueue = () => {
+export const InstructionQueue = () => {
     const queData = useSimulation((data) => data.instructionQueue)
     return (
         <Flex direction="column">
