@@ -416,8 +416,7 @@ export class Simulation {
     public readonly startClock = () => {
         if (this.timerId) return
         this.timerId = setInterval(() => {
-            this.tick()
-            this.publish()
+            this.step()
         }, 1000 / this.currentState.clockRate)
     }
 
@@ -439,7 +438,10 @@ export class Simulation {
             .map(issueStep)
             .map(dispatchStep)
             .map(broadcastStep)[0]
-        console.log(this.currentState.commonDataBus)
-        console.log(this.currentState.addSubtractFunctionUnits)
+    }
+
+    public readonly step = () => {
+        this.tick()
+        this.publish()
     }
 }
