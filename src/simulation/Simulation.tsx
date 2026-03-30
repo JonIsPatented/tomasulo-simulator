@@ -134,13 +134,13 @@ export const formatInstruction = (instruction: Instruction): string => {
         case 'sub':
         case 'mul':
         case 'div':
-            return `${instruction.opcode} x${instruction.destination}, x${instruction.source1}, x${instruction.source2}`
+            return `${instruction.opcode} f${instruction.destination}, f${instruction.source1}, f${instruction.source2}`
 
         case 'ld':
-            return `ld x${instruction.register}, ${instruction.offset}(x${instruction.baseRegister})`
+            return `ld f${instruction.register}, ${instruction.offset}(f${instruction.baseRegister})`
 
         case 'st':
-            return `st x${instruction.register}, ${instruction.offset}(x${instruction.baseRegister})`
+            return `st f${instruction.register}, ${instruction.offset}(f${instruction.baseRegister})`
     }
 }
 
