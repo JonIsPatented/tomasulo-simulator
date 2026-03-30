@@ -90,14 +90,14 @@ export const MainDiagram = () => {
                     <TitleBar />
                 </div>
                 {/* Instruction Queue */}
-                <div className='col-span-12'>
+                <div className='col-start-5 col-span-4'>
                     <Section title='Instruction Queue'>
                         <InstructionQueue />
                     </Section>
                 </div>
 
                 {/* Register File */}
-                <div ref={registerFileRef} className='col-span-3'>
+                <div ref={registerFileRef} className='row-start-3 col-span-3'>
                     <Section title='Register File'>
                         <RegisterFile />
                     </Section>
