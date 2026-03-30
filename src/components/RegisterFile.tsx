@@ -24,7 +24,7 @@ export const RegisterFile = () => {
                             color={isWaiting ? 'gray' : undefined}
                             className="whitespace-nowrap border-b border-gray-100 py-1"
                         >
-                            R{i}
+                            f{i}
                         </Text>
 
                         <TextField.Root

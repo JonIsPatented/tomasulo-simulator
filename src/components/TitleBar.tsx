@@ -34,6 +34,11 @@ export const TitleBar = () => {
             </Heading>
 
             <Flex gap="2" align="center">
+
+                <Button onClick={simulation.step} variant="outline">
+                    Step
+                </Button>
+
                 <Button onClick={simulation.startClock} variant="outline">
                     Start
                 </Button>
