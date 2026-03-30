@@ -96,6 +96,7 @@ export interface DataBus {
     destinationRegister: number | null
 }
 
+// Master list of opcodes
 export type Opcode =
     | 'ADD'
     | 'SUB'
@@ -104,11 +105,43 @@ export type Opcode =
     | 'LD'
     | 'ST';
 
-export interface Instruction {
-    opcode: Opcode
+// Subset of opcodes for arithmetic instructions
+export type ArithmeticOpcode = Extract<Opcode, 'ADD' | 'SUB' | 'MUL' | 'DIV'>
+
+// Subset of opcodes for memory instructions
+export type MemoryOpcode = Extract<Opcode, 'LD' | 'ST'>
+
+export interface ArithmeticInstruction {
+    opcode: ArithmeticOpcode
     destination: number
     source1: number
     source2: number
+}
+
+export interface MemoryInstruction {
+    opcode: MemoryOpcode
+    register: number
+    baseRegister: number
+    offset: number
+}
+
+export type Instruction = ArithmeticInstruction | MemoryInstruction
+
+// Format an instruction as a string for display in the UI
+export const formatInstruction = (instruction: Instruction): string => {
+    switch (instruction.opcode) {
+        case 'ADD':
+        case 'SUB':
+        case 'MUL':
+        case 'DIV':
+            return `${instruction.opcode} x${instruction.destination}, x${instruction.source1}, x${instruction.source2}`
+
+        case 'LD':
+            return `LD x${instruction.register}, ${instruction.offset}(x${instruction.baseRegister})`
+
+        case 'ST':
+            return `ST x${instruction.register}, ${instruction.offset}(x${instruction.baseRegister})`
+    }
 }
 
 export interface FunctionUnit {
