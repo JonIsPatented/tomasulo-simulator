@@ -113,7 +113,7 @@ export type MemoryOpcode = Extract<Opcode, 'LD' | 'ST'>
 
 export interface ArithmeticInstruction {
     opcode: ArithmeticOpcode
-    destination: number
+    destination: number 
     source1: number
     source2: number
 }
@@ -134,13 +134,13 @@ export const formatInstruction = (instruction: Instruction): string => {
         case 'SUB':
         case 'MUL':
         case 'DIV':
-            return `${instruction.opcode} x${instruction.destination}, x${instruction.source1}, x${instruction.source2}`
+            return `${instruction.opcode} f${instruction.destination}, f${instruction.source1}, f${instruction.source2}`
 
         case 'LD':
-            return `LD x${instruction.register}, ${instruction.offset}(x${instruction.baseRegister})`
+            return `LD f${instruction.register}, ${instruction.offset}(f${instruction.baseRegister})`
 
         case 'ST':
-            return `ST x${instruction.register}, ${instruction.offset}(x${instruction.baseRegister})`
+            return `ST f${instruction.register}, ${instruction.offset}(f${instruction.baseRegister})`
     }
 }
 
