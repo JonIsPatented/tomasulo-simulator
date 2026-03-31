@@ -5,7 +5,7 @@ const FuncUnitGroup = ({title,units,addOrMultiply}:{title :string,units:Array<Fu
     const index = 0
     return (
     <Flex direction="column">
-     <div>{title}</div>
+        <Text size="2" weight="bold">{title}</Text>
       <Grid columns="6" gap="2" className="items-center text-sm whitespace-nowrap">
             <Text size="1" weight="bold" color="gray">name</Text>
             <Text size="1" weight="bold" color="gray">Op</Text>
