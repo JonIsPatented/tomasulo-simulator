@@ -1,4 +1,4 @@
-import { Button, Dialog, Flex, Heading, Slider, Text } from "@radix-ui/themes"
+import { Button, Dialog, Flex, Grid, Heading, Slider, Text } from "@radix-ui/themes"
 import { useSimulation } from '../hooks/useSimulation'
 import { Simulation } from '../simulation/Simulation'
 
@@ -9,31 +9,33 @@ export const TitleBar = () => {
     const simulation = Simulation.getSimulation()
 
     return (
-        <Flex justify="between" align="center">
-            <Dialog.Root>
-                <Dialog.Trigger>
-                    <Button variant='outline' >Settings</Button>
-                </Dialog.Trigger>
-                <Dialog.Content className="DialogContent">
-                    <Dialog.Title className="DialogTitle">Settings</Dialog.Title>
-                    <Dialog.Description className="DialogDescription">
-                        Change how many clock cycles each instruction takes.
-                    </Dialog.Description>
-                    <div className='flex items-center gap-2'>Test:
-                        <Slider
-                            variant='classic'
-                            min={1}
-                            max={10}
-                        />
-                    </div>
-                </Dialog.Content>
-            </Dialog.Root>
-
-            <Heading size="4">
-                Tomasulo Simulator
-            </Heading>
-
-            <Flex gap="2" align="center">
+        <Grid columns="3">
+            <div>
+                <Dialog.Root>
+                    <Dialog.Trigger>
+                        <Button variant='outline' >Settings</Button>
+                    </Dialog.Trigger>
+                    <Dialog.Content className="DialogContent">
+                        <Dialog.Title className="DialogTitle">Settings</Dialog.Title>
+                        <Dialog.Description className="DialogDescription">
+                            Change how many clock cycles each instruction takes.
+                        </Dialog.Description>
+                        <div className='flex items-center gap-2'>Test:
+                            <Slider
+                                variant='classic'
+                                min={1}
+                                max={10}
+                            />
+                        </div>
+                    </Dialog.Content>
+                </Dialog.Root>
+            </div>
+            <Flex align="center" justify="center">
+                <Heading size="4">
+                    Tomasulo Simulator
+                </Heading>
+            </Flex>
+            <Flex gap="2" align="center" justify="end">
 
                 <Button onClick={simulation.step} variant="outline">
                     Step
@@ -68,6 +70,7 @@ export const TitleBar = () => {
                     ticks/sec
                 </Text>
             </Flex>
-        </Flex>
+        </Grid>
+        
     )
 }
