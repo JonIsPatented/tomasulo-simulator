@@ -9,117 +9,137 @@ import { CommonDataBus } from './CommonDataBus'
 import { Buffers } from './Buffers'
 import { Flex } from '@radix-ui/themes'
 import { InstructionQueue } from './InstructionQueue'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+
+import { type Position, WiringOverlay } from './WiringOverlay'
 
 export const MainDiagram = () => {
 
-    const containerRef = useRef(null)
+    const containerRef = useRef<HTMLDivElement | null>(null)
 
-    const registerFileRef = useRef(null)
-    const reservationStationsRef = useRef(null)
-    const loadStoreBuffersRef = useRef(null)
-    const functionUnitRef = useRef(null)
-
-    type Position = {
-        x: number,
-        y: number,
-        width: number
-        height: number,
-    }
+    const registerFileRef = useRef<HTMLDivElement | null>(null)
+    const reservationStationsRef = useRef<HTMLDivElement | null>(null)
+    const loadStoreBuffersRef = useRef<HTMLDivElement | null>(null)
+    const functionUnitRef = useRef<HTMLDivElement | null>(null)
+    const instructionQueueRef = useRef<HTMLDivElement | null>(null)
+    const commonDataBusRef = useRef<HTMLDivElement | null>(null)
 
     const [positions, setPositions] = useState<{
         registerFile: Position,
         reservationStations: Position,
         loadStoreBuffers: Position,
-        functionUnit: Position
+        functionUnits: Position,
+        instructionQueue: Position,
+        commonDataBus: Position,
     } | undefined>()
 
-    useEffect(() => {
-        const updatePositions = () => {
-            if (!containerRef.current) return
-            if (!registerFileRef.current) return
-            if (!reservationStationsRef.current) return
-            if (!loadStoreBuffersRef.current) return
-            if (!functionUnitRef.current) return
+    useLayoutEffect(() => {
+        const container = containerRef.current
+        const registerFile = registerFileRef.current
+        const reservationStations = reservationStationsRef.current
+        const loadStoreBuffers = loadStoreBuffersRef.current
+        const functionUnits = functionUnitRef.current
+        const instructionQueue = instructionQueueRef.current
+        const commonDataBus = commonDataBusRef.current
 
-            const getPosition = (element: HTMLElement, parent: HTMLElement) => {
-                const rect = element.getBoundingClientRect()
-                const parentRect = parent.getBoundingClientRect()
+        if (
+            !container ||
+            !registerFile ||
+            !reservationStations ||
+            !loadStoreBuffers ||
+            !functionUnits ||
+            !instructionQueue ||
+            !commonDataBus
+        ) {
+            return
+        }
 
-                return {
-                    x: rect.left - parentRect.left,
-                    y: rect.top - parentRect.top,
-                    width: rect.width,
-                    height: rect.height
-                }
+        const getPosition = (element: Element) => {
+            const rect = element.getBoundingClientRect()
+            const parentRect = container.getBoundingClientRect()
+
+            return {
+                x: rect.left - parentRect.left,
+                y: rect.top - parentRect.top,
+                width: rect.width,
+                height: rect.height
             }
+        }
 
-            const registerFilePos = getPosition(
-                registerFileRef.current, containerRef.current
-            )
-            const reservationStationsPos = getPosition(
-                reservationStationsRef.current, containerRef.current
-            )
-            const loadStoreBufferPos = getPosition(
-                loadStoreBuffersRef.current, containerRef.current
-            )
-            const functionUnitPos = getPosition(
-                functionUnitRef.current, containerRef.current
-            )
-
+        const updatePositions = () => {
             setPositions({
-                registerFile: registerFilePos,
-                reservationStations: reservationStationsPos,
-                loadStoreBuffers: loadStoreBufferPos,
-                functionUnit: functionUnitPos
+                registerFile: getPosition(registerFile),
+                reservationStations: getPosition(reservationStations),
+                loadStoreBuffers: getPosition(loadStoreBuffers),
+                functionUnits: getPosition(functionUnits),
+                instructionQueue: getPosition(instructionQueue),
+                commonDataBus: getPosition(commonDataBus)
             })
         }
 
-        updatePositions()
-        window.addEventListener('resize', updatePositions)
+        let frame: number | null = null
 
-        return () => window.removeEventListener('resize', updatePositions)
+        const observer = new ResizeObserver(() => {
+            if (frame) cancelAnimationFrame(frame)
+            frame = requestAnimationFrame(updatePositions)
+        })
+
+        observer.observe(container)
+        observer.observe(registerFile)
+        observer.observe(reservationStations)
+        observer.observe(loadStoreBuffers)
+        observer.observe(functionUnits)
+        observer.observe(instructionQueue)
+        observer.observe(commonDataBus)
+
+        updatePositions()
+
+        return () => {
+            observer.disconnect()
+            if (frame) cancelAnimationFrame(frame)
+        }
     }, [])
 
     return (
-        <div ref={containerRef} className='h-full p-4'>
-            <div className='grid grid-cols-12 gap-4 auto-rows-auto'>
+        <div ref={containerRef} className='h-full p-4 relative'>
+            <div className='grid grid-cols-12 gap-8 auto-rows-auto'>
 
                 {/* Controls */}
                 <div className='col-span-12'>
                     <TitleBar />
                 </div>
+
                 {/* Instruction Queue */}
                 <div className='col-start-5 col-span-4'>
-                    <Section title='Instruction Queue'>
+                    <Section ref={instructionQueueRef} title='Instruction Queue'>
                         <InstructionQueue />
                     </Section>
                 </div>
 
                 {/* Register File */}
-                <div ref={registerFileRef} className='row-start-3 col-span-3'>
-                    <Section title='Register File'>
+                <div className='row-start-3 col-span-3'>
+                    <Section ref={registerFileRef} title='Register File'>
                         <RegisterFile />
                     </Section>
                 </div>
 
                 {/* Reservation Stations */}
-                <div ref={reservationStationsRef} className='col-span-6'>
-                    <Section title='Reservation Stations'>
+                <div className='col-span-6'>
+                    <Section ref={reservationStationsRef} title='Reservation Stations'>
                         <ReservationStations />
                     </Section>
                 </div>
 
                 {/* Load / Store Buffers */}
-                <div ref={loadStoreBuffersRef} className='col-span-3'>
-                    <Section title='Load / Store Buffers'>
+                <div className='col-span-3'>
+                    <Section ref={loadStoreBuffersRef} title='Load / Store Buffers'>
                         <Buffers />
                     </Section>
                 </div>
 
                 {/* Functional Units */}
-                <div ref={functionUnitRef} className='col-span-6 col-start-4'>
-                    <Section title='Functional Units'>
+                <div className='col-span-6 col-start-4'>
+                    <Section ref={functionUnitRef} title='Functional Units'>
                         <FuncUnits />
                     </Section>
                 </div>
@@ -127,11 +147,12 @@ export const MainDiagram = () => {
                 {/* Common Data Bus */}
                 <div className='col-span-12'>
                     <Flex justify='center'>
-                        <CommonDataBus />
+                        <CommonDataBus ref={commonDataBusRef} />
                     </Flex>
                 </div>
 
             </div>
+            {positions && <WiringOverlay {...positions} />}
         </div>
     )
 }
