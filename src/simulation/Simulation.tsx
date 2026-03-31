@@ -180,6 +180,20 @@ export interface SimulatorData {
     // Clock rate of the simulation, measured
     // in ticks per second
     clockRate: number
+
+    // Flags that indicate whether data was just
+    // transmitted along the noted wires during the
+    // most recent clock cycle
+    transmitFlags: {
+        registerFileToReservationStations: boolean,
+        loadStoreBuffersToReservationStations: boolean,
+        reservationStationsToFunctionUnits: boolean,
+        instructionQueueToReservationStations: boolean,
+        functionUnitsToCommonDataBus: boolean,
+        commonDataBusToRegisterFile: boolean,
+        commonDataBusToLoadStoreUnits: boolean,
+        commonDataBusToReservationStations: boolean,
+    }
 }
 
 export class Simulation {
@@ -398,7 +412,18 @@ export class Simulation {
                 source2: 1,
                 destination: 3
             }
-        ]
+        ],
+        transmitFlags: {
+            registerFileToReservationStations: false,
+            loadStoreBuffersToReservationStations: false,
+            reservationStationsToFunctionUnits: false,
+            instructionQueueToReservationStations: false,
+            functionUnitsToCommonDataBus: false,
+            commonDataBusToRegisterFile: false,
+            commonDataBusToLoadStoreUnits: false,
+            commonDataBusToReservationStations: false,
+        }
+
     }
 
     public readonly getSimulatorData = (): SimulatorData => {
@@ -435,6 +460,21 @@ export class Simulation {
 
     private readonly tick = () => {
         this.currentState = [this.currentState]
+            .map(data => {
+                return {
+                    ...data,
+                    transmitFlags: {
+                        registerFileToReservationStations: false,
+                        loadStoreBuffersToReservationStations: false,
+                        reservationStationsToFunctionUnits: false,
+                        instructionQueueToReservationStations: false,
+                        functionUnitsToCommonDataBus: false,
+                        commonDataBusToRegisterFile: false,
+                        commonDataBusToLoadStoreUnits: false,
+                        commonDataBusToReservationStations: false,
+                    }
+                }
+            })
             .map(issueStep)
             .map(dispatchStep)
             .map(broadcastStep)[0]

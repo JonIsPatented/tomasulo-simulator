@@ -40,6 +40,11 @@ export const issueStep = (currentState: SimulatorData): SimulatorData => {
         return currentState
     }
 
+    let newTransmitFlags = {
+        ...currentState.transmitFlags,
+        instructionQueueToReservationStations: true
+    }
+
     const getOperand = (regIndex: number) => {
         const reg = regFile[regIndex]
 
@@ -52,11 +57,22 @@ export const issueStep = (currentState: SimulatorData): SimulatorData => {
         }
 
         if (reg.value !== null) {
+
+            newTransmitFlags = {
+                ...newTransmitFlags,
+                registerFileToReservationStations: true
+            }
+
             return {
                 value: reg.value,
                 station: null,
                 waitingRegister: null
             }
+        }
+
+        newTransmitFlags = {
+            ...newTransmitFlags,
+            loadStoreBuffersToReservationStations: true
         }
 
         return {
@@ -99,6 +115,7 @@ export const issueStep = (currentState: SimulatorData): SimulatorData => {
         ...currentState,
         reservationStations: resStations,
         registerFile: regFile,
-        instructionQueue: queue.slice(1)
+        instructionQueue: queue.slice(1),
+        transmitFlags: newTransmitFlags,
     }
 }

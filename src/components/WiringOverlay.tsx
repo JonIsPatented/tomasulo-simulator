@@ -1,3 +1,5 @@
+import { useSimulation } from "../hooks/useSimulation"
+
 export type Position = {
     x: number,
     y: number,
@@ -50,6 +52,8 @@ export const WiringOverlay = ({
     if (!instructionQueue) return <></>
     if (!commonDataBus) return <></>
 
+    const transmitFlags = useSimulation(data => data.transmitFlags)
+
     return (
         <svg
             className="absolute top-0 left-0 w-full h-full pointer-events-none"
@@ -86,33 +90,38 @@ export const WiringOverlay = ({
             </defs>
 
             <Wire
-                from={left(reservationStations)}
-                to={right(registerFile)}
+                from={right(registerFile)}
+                to={left(reservationStations)}
                 orthogonalDirection="horizontal"
+                active={transmitFlags.registerFileToReservationStations}
             />
 
             <Wire
-                from={right(reservationStations)}
-                to={left(loadStoreBuffers)}
+                from={left(loadStoreBuffers)}
+                to={right(reservationStations)}
                 orthogonalDirection="horizontal"
+                active={transmitFlags.loadStoreBuffersToReservationStations}
             />
 
             <Wire
                 from={bottom(reservationStations)}
                 to={top(functionUnits)}
                 orthogonalDirection="vertical"
+                active={transmitFlags.reservationStationsToFunctionUnits}
             />
 
             <Wire
                 from={bottom(instructionQueue)}
                 to={top(reservationStations)}
                 orthogonalDirection="vertical"
+                active={transmitFlags.instructionQueueToReservationStations}
             />
 
             <Wire
                 from={bottom(functionUnits)}
                 to={top(commonDataBus)}
                 orthogonalDirection="vertical"
+                active={transmitFlags.functionUnitsToCommonDataBus}
             />
 
             <Wire
@@ -122,6 +131,7 @@ export const WiringOverlay = ({
                 }}
                 to={bottom(registerFile)}
                 orthogonalDirection="vertical"
+                active={transmitFlags.commonDataBusToRegisterFile}
             />
 
             <Wire
@@ -131,7 +141,20 @@ export const WiringOverlay = ({
                 }}
                 to={bottom(loadStoreBuffers)}
                 orthogonalDirection="vertical"
-                active
+                active={transmitFlags.commonDataBusToLoadStoreUnits}
+            />
+
+            <Wire
+                from={{
+                    ...top(commonDataBus),
+                    x: (left(reservationStations).x + left(functionUnits).x) / 2
+                }}
+                to={{
+                    ...bottom(reservationStations),
+                    x: (left(reservationStations).x + left(functionUnits).x) / 2
+                }}
+                orthogonalDirection="vertical"
+                active={transmitFlags.commonDataBusToReservationStations}
             />
         </svg>
     )

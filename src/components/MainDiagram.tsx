@@ -9,7 +9,7 @@ import { CommonDataBus } from './CommonDataBus'
 import { Buffers } from './Buffers'
 import { Flex } from '@radix-ui/themes'
 import { InstructionQueue } from './InstructionQueue'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 
 import { type Position, WiringOverlay } from './WiringOverlay'
 
@@ -138,7 +138,7 @@ export const MainDiagram = () => {
                 </div>
 
                 {/* Functional Units */}
-                <div className='col-span-6 col-start-4'>
+                <div className='col-span-5 col-start-5'>
                     <Section ref={functionUnitRef} title='Functional Units'>
                         <FuncUnits />
                     </Section>
