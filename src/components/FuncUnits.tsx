@@ -7,8 +7,8 @@ const FuncUnitGroup = ({title,units,addOrMultiply}:{title :string,units:Array<Fu
     return (
     <Flex direction="column">
         <Text size="2" weight="bold">{title}</Text>
-      <Grid columns="6" gap="2" className="items-center text-sm whitespace-nowrap">
-            <Text size="1" weight="bold" color="gray">Name</Text>
+      <Grid columns="5" gap="2" className="items-center text-sm whitespace-nowrap">
+            
             <Text size="1" weight="bold" color="gray">Op</Text>
             <Text size="1" weight="bold" color="gray">Arg1</Text>
             <Text size="1" weight="bold" color="gray">Arg2</Text>
@@ -23,11 +23,10 @@ const FuncUnitGroup = ({title,units,addOrMultiply}:{title :string,units:Array<Fu
 }
 const FuncUnitRows = ({unit,addOrMull,Index}:{unit:FunctionUnit,addOrMull:String,Index:Number}) =>{
     
-    const name = addOrMull +Index.toString();
+   
 
     return(
     <>
-        <Text className="border-b border-gray-100 py-1">{name}</Text>
         <Text className="border-b border-gray-100 py-1">{unit.operation ?? "-"}</Text>
         <Text className="border-b border-gray-100 py-1">{unit.firstArgumentValue ?? "-"}</Text>
         <Text className="border-b border-gray-100 py-1">{unit.secondArgumentValue ?? "-"}</Text>
