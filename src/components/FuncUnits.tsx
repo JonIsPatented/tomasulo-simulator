@@ -29,7 +29,7 @@ const FuncUnitRows = ({unit,addOrMull}:{unit:FunctionUnit,addOrMull:String}) =>{
         <Text className="border-b border-gray-100 py-1">{unit.firstArgumentValue ?? "-"}</Text>
         <Text className="border-b border-gray-100 py-1">{unit.secondArgumentValue ?? "-"}</Text>
         <Text className="border-b border-gray-100 py-1">{unit.ticksLeft ?? "-"}</Text>
-       <Text className="border-b border-gray-100 py-1">{soruseValue}</Text>
+        <Text className="border-b border-gray-100 py-1">{soruseValue}</Text>
         
     </>
     )
