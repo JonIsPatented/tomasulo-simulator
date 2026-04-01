@@ -10,7 +10,7 @@ export const TitleBar = () => {
 
     return (
         <Grid columns="3">
-            <div>
+            <Flex justify="start" align="center">
                 <Dialog.Root>
                     <Dialog.Trigger>
                         <Button variant='outline' >Settings</Button>
@@ -29,7 +29,7 @@ export const TitleBar = () => {
                         </div>
                     </Dialog.Content>
                 </Dialog.Root>
-            </div>
+            </Flex>
             <Flex align="center" justify="center">
                 <Heading size="4">
                     Tomasulo Simulator
