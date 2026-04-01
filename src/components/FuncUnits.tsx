@@ -15,13 +15,13 @@ const FuncUnitGroup = ({title,units,addOrMultiply}:{title :string,units:Array<Fu
             <Text size="1" weight="bold" color="gray" wrap="wrap">Cycles left</Text>
             <Text size="1" weight="bold" color="gray">Source</Text>
         {units.map((i)=>(
-            <FuncUnitRows unit={i} addOrMull={addOrMultiply} Index={index}/>
+            <FuncUnitRows unit={i} addOrMull={addOrMultiply}/>
         ))}
     </Grid>
 </Flex>
 )
 }
-const FuncUnitRows = ({unit,addOrMull,Index}:{unit:FunctionUnit,addOrMull:String,Index:Number}) =>{
+const FuncUnitRows = ({unit,addOrMull}:{unit:FunctionUnit,addOrMull:String}) =>{
     
    
 
