@@ -6,9 +6,14 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
 
     let resStations = currentState.reservationStations
     let regFile = currentState.registerFile
+    let transmitFlags = currentState.transmitFlags
 
     if (bus.value !== null) {
         if (bus.sourceStation !== null) {
+            transmitFlags = {
+                ...transmitFlags,
+                commonDataBusToRegisterFile: true,
+            }
             resStations = resStations.map((station, i) => {
                 const firstFromStation = station.firstArgumentStation === bus.sourceStation
                 const secondFromStation = station.secondArgumentStation === bus.sourceStation
@@ -24,6 +29,12 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
                         secondArgumentWaitingRegister: null,
                         isEmpty: true,
                         isExecuting: false,
+                    }
+
+                if (firstFromStation || secondFromStation)
+                    transmitFlags = {
+                        ...transmitFlags,
+                        commonDataBusToReservationStations: true,
                     }
 
                 return {
@@ -49,9 +60,20 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
             })
         }
         else if (bus.destinationRegister !== null) {
+            transmitFlags = {
+                ...transmitFlags,
+                commonDataBusToLoadStoreUnits: true,
+                commonDataBusToReservationStations: true,
+            }
             resStations = resStations.map((station) => {
                 const firstFromRegister = station.firstArgumentWaitingRegister === bus.destinationRegister
                 const secondFromRegister = station.secondArgumentWaitingRegister === bus.destinationRegister
+
+                if (firstFromRegister || secondFromRegister)
+                    transmitFlags = {
+                        ...transmitFlags,
+                        commonDataBusToReservationStations: true,
+                    }
 
                 return {
                     ...station,
@@ -96,6 +118,7 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
 
     let addSubFuncUnits = currentState.addSubtractFunctionUnits.map(dec)
     let mulDivFuncUnits = currentState.multiplyDivideFunctionUnits.map(dec)
+    let functionUnitTransmit = false
 
     if (readyStationsByIndex.length === 0) {
         return {
@@ -103,7 +126,8 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
             reservationStations: resStations,
             registerFile: regFile,
             addSubtractFunctionUnits: addSubFuncUnits,
-            multiplyDivideFunctionUnits: mulDivFuncUnits
+            multiplyDivideFunctionUnits: mulDivFuncUnits,
+            transmitFlags: transmitFlags,
         }
     }
 
@@ -137,6 +161,8 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
                 }
                 return s
             })
+
+            functionUnitTransmit = true
         }
     }
 
@@ -169,6 +195,8 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
                 }
                 return s
             })
+
+            functionUnitTransmit = true
         }
     }
 
@@ -179,6 +207,10 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
         registerFile: regFile,
         addSubtractFunctionUnits: addSubFuncUnits,
         multiplyDivideFunctionUnits: mulDivFuncUnits,
+        transmitFlags: {
+            ...transmitFlags,
+            reservationStationsToFunctionUnits: functionUnitTransmit
+        },
     }
 
 }
