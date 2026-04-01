@@ -3,7 +3,6 @@ import { useSimulation } from "../hooks/useSimulation";
 import { type FunctionUnit } from "../simulation/Simulation"; 
 
 const FuncUnitGroup = ({title,units,addOrMultiply}:{title :string,units:Array<FunctionUnit>,addOrMultiply:String}) => {
-    const index = 0
     return (
     <Flex direction="column">
         <Text size="2" weight="bold">{title}</Text>
@@ -31,7 +30,11 @@ const FuncUnitRows = ({unit,addOrMull}:{unit:FunctionUnit,addOrMull:String}) =>{
         <Text className="border-b border-gray-100 py-1">{unit.firstArgumentValue ?? "-"}</Text>
         <Text className="border-b border-gray-100 py-1">{unit.secondArgumentValue ?? "-"}</Text>
         <Text className="border-b border-gray-100 py-1">{unit.ticksLeft ?? "-"}</Text>
-       <Text className="border-b border-gray-100 py-1">{unit.sourceReservationStation ? `${addOrMull}${unit.sourceReservationStation}`: "-"}</Text>
+       <Text className="border-b border-gray-100 py-1">
+  {unit.sourceReservationStation != null
+    ? `${addOrMull}${unit.sourceReservationStation}`
+    : "-"}
+</Text>
         
     </>
     )
