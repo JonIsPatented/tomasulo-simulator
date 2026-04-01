@@ -21,20 +21,15 @@ const FuncUnitGroup = ({title,units,addOrMultiply}:{title :string,units:Array<Fu
 )
 }
 const FuncUnitRows = ({unit,addOrMull}:{unit:FunctionUnit,addOrMull:String}) =>{
-    
-   
-
+   const addrResCount = useSimulation((data) => data.adderReservationStationCount)
+   const soruseValue = unit.sourceReservationStation != null ? `${addOrMull}${addOrMull==="mul"?unit.sourceReservationStation-addrResCount:unit.sourceReservationStation}`:"-"
     return(
     <>
         <Text className="border-b border-gray-100 py-1">{unit.operation ?? "-"}</Text>
         <Text className="border-b border-gray-100 py-1">{unit.firstArgumentValue ?? "-"}</Text>
         <Text className="border-b border-gray-100 py-1">{unit.secondArgumentValue ?? "-"}</Text>
         <Text className="border-b border-gray-100 py-1">{unit.ticksLeft ?? "-"}</Text>
-       <Text className="border-b border-gray-100 py-1">
-  {unit.sourceReservationStation != null
-    ? `${addOrMull}${unit.sourceReservationStation}`
-    : "-"}
-</Text>
+       <Text className="border-b border-gray-100 py-1">{soruseValue}</Text>
         
     </>
     )
