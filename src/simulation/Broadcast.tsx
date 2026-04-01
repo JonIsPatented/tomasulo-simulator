@@ -40,7 +40,7 @@ const computeResult = (
     }
 }
 
-export const broadcastStep = (currentState: SimulatorData) => {
+export const broadcastStep = (currentState: SimulatorData): SimulatorData => {
     const multiplyFunctionUnit = currentState.multiplyDivideFunctionUnits[0]
     const addFunctionUnit = currentState.addSubtractFunctionUnits[0]
 
@@ -67,6 +67,10 @@ export const broadcastStep = (currentState: SimulatorData) => {
                     isEmpty: true
                 }
             ],
+            transmitFlags: {
+                ...currentState.transmitFlags,
+                functionUnitsToCommonDataBus: true
+            },
         }
     }
 
@@ -93,6 +97,10 @@ export const broadcastStep = (currentState: SimulatorData) => {
                     isEmpty: true
                 }
             ],
+            transmitFlags: {
+                ...currentState.transmitFlags,
+                functionUnitsToCommonDataBus: true
+            },
         }
     }
 
