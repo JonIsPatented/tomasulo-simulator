@@ -96,24 +96,19 @@ export interface DataBus {
     destinationRegister: number | null
 }
 
-// Master list of opcodes
-export type Opcode =
-    | 'add'
-    | 'sub'
-    | 'mul'
-    | 'div'
-    | 'ld'
-    | 'st'
 
 // Subset of opcodes for arithmetic instructions
-export type ArithmeticOpcode = Extract<Opcode, 'add' | 'sub' | 'mul' | 'div'>
+export type ArithmeticOpcode = 'add' | 'sub' | 'mul' | 'div'
 
 // Subset of opcodes for memory instructions
-export type MemoryOpcode = Extract<Opcode, 'ld' | 'st'>
+export type MemoryOpcode = 'ld' | 'st'
+
+// Master list of opcodes
+export type Opcode = ArithmeticOpcode | MemoryOpcode
 
 export interface ArithmeticInstruction {
     opcode: ArithmeticOpcode
-    destination: number 
+    destination: number
     source1: number
     source2: number
 }
