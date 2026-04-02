@@ -108,7 +108,6 @@ export const MainDiagram = () => {
                 <div className='col-span-12'>
                     <TitleBar />
                 </div>
-
                 {/* Instruction Queue */}
                 <div className='col-start-5 col-span-4'>
                     <Section ref={instructionQueueRef} title='Instruction Queue'>
