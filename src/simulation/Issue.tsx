@@ -13,12 +13,12 @@ export const issueStep = (currentState: SimulatorData): SimulatorData => {
     let regFile = [...currentState.registerFile]
 
     const isAddSub =
-        instruction.opcode === 'ADD' ||
-        instruction.opcode === 'SUB'
+        instruction.opcode === 'add' ||
+        instruction.opcode === 'sub'
 
     const isMulDiv =
-        instruction.opcode === 'MUL' ||
-        instruction.opcode === 'DIV'
+        instruction.opcode === 'mul' ||
+        instruction.opcode === 'div'
 
     // Ignore LD/ST for now
     if (!isAddSub && !isMulDiv) {
@@ -86,10 +86,10 @@ export const issueStep = (currentState: SimulatorData): SimulatorData => {
     const op2 = getOperand(instruction.source2)
 
     const opMap = {
-        ADD: '+',
-        SUB: '-',
-        MUL: '*',
-        DIV: '/'
+        add: '+',
+        sub: '-',
+        mul: '*',
+        div: '/'
     } as const
 
     resStations[freeIndex] = {

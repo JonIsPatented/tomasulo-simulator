@@ -96,19 +96,52 @@ export interface DataBus {
     destinationRegister: number | null
 }
 
+// Master list of opcodes
 export type Opcode =
-    | 'ADD'
-    | 'SUB'
-    | 'MUL'
-    | 'DIV'
-    | 'LD'
-    | 'ST';
+    | 'add'
+    | 'sub'
+    | 'mul'
+    | 'div'
+    | 'ld'
+    | 'st'
 
-export interface Instruction {
-    opcode: Opcode
-    destination: number
+// Subset of opcodes for arithmetic instructions
+export type ArithmeticOpcode = Extract<Opcode, 'add' | 'sub' | 'mul' | 'div'>
+
+// Subset of opcodes for memory instructions
+export type MemoryOpcode = Extract<Opcode, 'ld' | 'st'>
+
+export interface ArithmeticInstruction {
+    opcode: ArithmeticOpcode
+    destination: number 
     source1: number
     source2: number
+}
+
+export interface MemoryInstruction {
+    opcode: MemoryOpcode
+    register: number
+    baseRegister: number
+    offset: number
+}
+
+export type Instruction = ArithmeticInstruction | MemoryInstruction
+
+// Format an instruction as a string for display in the UI
+export const formatInstruction = (instruction: Instruction): string => {
+    switch (instruction.opcode) {
+        case 'add':
+        case 'sub':
+        case 'mul':
+        case 'div':
+            return `${instruction.opcode} f${instruction.destination}, f${instruction.source1}, f${instruction.source2}`
+
+        case 'ld':
+            return `ld f${instruction.register}, ${instruction.offset}(f${instruction.baseRegister})`
+
+        case 'st':
+            return `st f${instruction.register}, ${instruction.offset}(f${instruction.baseRegister})`
+    }
 }
 
 export interface FunctionUnit {
@@ -389,25 +422,25 @@ export class Simulation {
         clockRate: 4,
         instructionQueue: [
             {
-                opcode: 'MUL',
+                opcode: 'mul',
                 source1: 0,
                 source2: 1,
                 destination: 0
             },
             {
-                opcode: 'ADD',
+                opcode: 'add',
                 source1: 1,
                 source2: 1,
                 destination: 2
             },
             {
-                opcode: 'SUB',
+                opcode: 'sub',
                 source1: 1,
                 source2: 2,
                 destination: 2
             },
             {
-                opcode: 'DIV',
+                opcode: 'div',
                 source1: 0,
                 source2: 1,
                 destination: 3
