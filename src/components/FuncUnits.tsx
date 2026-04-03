@@ -1,23 +1,38 @@
 import { Flex } from "@radix-ui/themes";
+import { type FunctionUnitData } from "../simulation/Simulation";
 import { useSimulation } from "../hooks/useSimulation";
-export const FuncUnits = () => {
-    const [MDF, ASF] = useSimulation((data) => [data.multiplyDivideFunctionUnits, data.addSubtractFunctionUnits])
-    return (
 
+const FunctionUnit = ({ functionUnit }: { functionUnit: FunctionUnitData<number> }) => {
+    if (functionUnit.isEmpty) return
+    return (
+        <>
+            <div>{functionUnit.operation}</div>
+            <div>{functionUnit.firstArgument}</div>
+            <div>{functionUnit.secondArgument}</div>
+            <div>{functionUnit.ticksLeft}</div>
+            <div>{functionUnit.sourceStationIndex}</div>
+        </>
+    )
+}
+
+export const FuncUnits = () => {
+    const {
+        mulDivFuncUnits,
+        addSubFuncUnits,
+    } = useSimulation((data) => {
+        return {
+            mulDivFuncUnits: data.multiplyDivideFunctionUnits,
+            addSubFuncUnits: data.addSubtractFunctionUnits,
+        }
+    })
+
+    return (
         <Flex direction="column">
             <Flex direction="row" gap="2">
-                <div>{MDF[0].operation}</div>
-                <div>{MDF[0].firstArgumentValue}</div>
-                <div>{MDF[0].secondArgumentValue}</div>
-                <div>{MDF[0].ticksLeft}</div>
-                <div>{MDF[0].sourceReservationStation}</div>
+                <FunctionUnit functionUnit={mulDivFuncUnits[0]} />
             </Flex>
             <Flex direction="row" gap="2">
-                <div>{ASF[0].operation}</div>
-                <div>{ASF[0].firstArgumentValue}</div>
-                <div>{ASF[0].secondArgumentValue}</div>
-                <div>{ASF[0].ticksLeft}</div>
-                <div>{ASF[0].sourceReservationStation}</div>
+                <FunctionUnit functionUnit={addSubFuncUnits[0]} />
             </Flex>
         </Flex>
     )

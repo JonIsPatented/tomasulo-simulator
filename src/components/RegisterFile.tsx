@@ -14,7 +14,7 @@ export const RegisterFile = () => {
 
             {/* Registers */}
             {registerFile.map((reg, i) => {
-                const isWaiting = reg.alias !== null
+                const isWaiting = !reg.hasValue
 
                 return (
                     <>
@@ -30,7 +30,7 @@ export const RegisterFile = () => {
                         <TextField.Root
                             key={`val-${i}`}
                             size="1"
-                            value={reg.value ?? '-'}
+                            value={reg.hasValue ? reg.value : '-'}
                             readOnly
                             className="text-center"
                         />
@@ -42,7 +42,7 @@ export const RegisterFile = () => {
                             color={isWaiting ? 'gray' : undefined}
                             className="whitespace-nowrap border-b border-gray-100 py-1"
                         >
-                            {reg.alias !== null ? `RS${reg.alias}` : '-'}
+                            {!reg.hasValue ? `RS${reg.alias}` : '-'}
                         </Text>
                     </>
                 )

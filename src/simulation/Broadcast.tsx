@@ -1,42 +1,24 @@
-import type { SimulatorData } from "./Simulation"
+import type { ArithmeticOpcode, SimulatorData } from "./Simulation"
 
 // ⋆.˚⟡ ࣪ ˖ MEMORY IS A LIE ⋆.˚⟡ ࣪ ˖
 // for now...
 
-const emptyBus = () => {
-    return {
-        value: null,
-        sourceStation: null,
-        destinationRegister: null
-    }
-}
-
 // Computes the result for each type of operation
 // Currently does not support load / store
 const computeResult = (
-    operation: '+' | '-' | '*' | '/' | null,
-    firstArgumentValue: number | null,
-    secondArgumentValue: number | null
-): number | null => {
-    if (
-        operation === null ||
-        firstArgumentValue === null ||
-        secondArgumentValue === null
-    ) {
-        return null
-    }
-
+    operation: ArithmeticOpcode,
+    firstArgumentValue: number,
+    secondArgumentValue: number
+): number => {
     switch (operation) {
-        case '+':
+        case 'add':
             return firstArgumentValue + secondArgumentValue
-        case '-':
+        case 'sub':
             return firstArgumentValue - secondArgumentValue
-        case '*':
+        case 'mul':
             return firstArgumentValue * secondArgumentValue
-        case '/':
+        case 'div':
             return secondArgumentValue === 0 ? NaN : firstArgumentValue / secondArgumentValue
-        default:
-            return null
     }
 }
 
@@ -45,25 +27,21 @@ export const broadcastStep = (currentState: SimulatorData): SimulatorData => {
     const addFunctionUnit = currentState.addSubtractFunctionUnits[0]
 
     // Checks if the mul / div function unit is done
-    if (multiplyFunctionUnit.ticksLeft === 0) {
+    if (!multiplyFunctionUnit.isEmpty && multiplyFunctionUnit.ticksLeft === 0) {
         return {
             ...currentState,
             commonDataBus: {
+                isActive: true,
                 value: computeResult(
                     multiplyFunctionUnit.operation,
-                    multiplyFunctionUnit.firstArgumentValue,
-                    multiplyFunctionUnit.secondArgumentValue
+                    multiplyFunctionUnit.firstArgument,
+                    multiplyFunctionUnit.secondArgument,
                 ),
-                sourceStation: multiplyFunctionUnit.sourceReservationStation,
-                destinationRegister: null
+                source: 'operation',
+                sourceStation: multiplyFunctionUnit.sourceStationIndex,
             },
             multiplyDivideFunctionUnits: [
                 {
-                    operation: null,
-                    firstArgumentValue: null,
-                    secondArgumentValue: null,
-                    ticksLeft: null,
-                    sourceReservationStation: null,
                     isEmpty: true
                 }
             ],
@@ -75,25 +53,21 @@ export const broadcastStep = (currentState: SimulatorData): SimulatorData => {
     }
 
     // Checks if the add / sub function unit is done
-    if (addFunctionUnit.ticksLeft === 0) {
+    if (!addFunctionUnit.isEmpty && addFunctionUnit.ticksLeft === 0) {
         return {
             ...currentState,
             commonDataBus: {
+                isActive: true,
                 value: computeResult(
                     addFunctionUnit.operation,
-                    addFunctionUnit.firstArgumentValue,
-                    addFunctionUnit.secondArgumentValue
+                    addFunctionUnit.firstArgument,
+                    addFunctionUnit.secondArgument
                 ),
-                sourceStation: addFunctionUnit.sourceReservationStation,
-                destinationRegister: null
+                source: 'operation',
+                sourceStation: addFunctionUnit.sourceStationIndex,
             },
             addSubtractFunctionUnits: [
                 {
-                    operation: null,
-                    firstArgumentValue: null,
-                    secondArgumentValue: null,
-                    ticksLeft: null,
-                    sourceReservationStation: null,
                     isEmpty: true
                 }
             ],
@@ -106,6 +80,8 @@ export const broadcastStep = (currentState: SimulatorData): SimulatorData => {
 
     return {
         ...currentState,
-        commonDataBus: emptyBus()
+        commonDataBus: {
+            isActive: false
+        }
     }
 }

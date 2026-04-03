@@ -2,101 +2,188 @@ import { broadcastStep } from './Broadcast.tsx'
 import { dispatchStep } from './Dispatch.tsx'
 import { issueStep } from './Issue.tsx'
 
-export interface ReservationStationData {
-    // Which operation is being performed in this station
-    // or null if the station is empty
-    operation: '+' | '-' | '*' | '/' | null
+// Result Type
+export interface Success<T> {
+    ok: true
+    value: T
+}
 
-    // The value of the first argument, or null if
-    // the argument is awaiting another station or
-    // if this station is empty
-    firstArgumentValue: number | null
+export interface Failure<E> {
+    ok: false
+    error: E
+}
 
-    // The number of the station the first argument
-    // is awaiting, or null if the argument is not
-    // awaiting another station or if this station
-    // is empty
-    firstArgumentStation: number | null
+export type Result<T, E> = Success<T> | Failure<E>
+// End Result Type
 
-    // The index of the register the first argument
-    // is awaiting, or null if the argument is not
-    // awaiting a register load or if this station
-    // is empty
-    firstArgumentWaitingRegister: number | null
+// RegisterData Type
+export interface ValueRegister<T> {
+    hasValue: true
+    value: T
+}
 
-    // The value of the second argument, or null if
-    // the argument is awaiting another station or
-    // if this station is empty
-    secondArgumentValue: number | null
+export interface AliasRegister {
+    hasValue: false
+    alias: number
+}
 
-    // The number of the station the first argument
-    // is awaiting, or null if the argument is not
-    // awaiting another station or if this station
-    // is empty
-    secondArgumentStation: number | null
+export type RegisterData<T> = ValueRegister<T> | AliasRegister
+// End RegisterData Type
 
-    // The index of the register the second argument
-    // is awaiting, or null if the argument is not
-    // awaiting a register load or if this station
-    // is empty
-    secondArgumentWaitingRegister: number | null
+// ReservationStationData Type
+export interface EmptyStation {
+    isEmpty: true
+    isExecuting: false
+    isReady: false
+}
 
-    // Whether this station is empty
-    isEmpty: boolean
-
-    // Whether this station is executing
+export interface ReadyStation<T> {
+    isEmpty: false
     isExecuting: boolean
+    isReady: true
+    operation: ArithmeticOpcode
+    firstArgument: T
+    secondArgument: T
 }
 
-export interface LoadStoreBufferData {
-
-    // Memory address if known, or null if still waiting
-    addressValue: number | null
-
-    // Reservation station this address is waiting on,
-    // or null if not waiting
-    addressStation: number | null
-
-    // Value to store.
-    // This can be null if it's a load buffer
-    dataValue: number | null
-
-    // Reservation station this data is waiting on,
-    // or null if not waiting
-    dataStation: number | null
-
-    // Whether this buffer is empty
-    isEmpty: boolean
+export interface ReadyArgument<T> {
+    isReady: true
+    value: T
 }
 
-export interface RegisterData {
-    // Alias for this register (to a reservation station),
-    // with a number indicating the index of the corresponding
-    // reservation station, and null indicating no alias
-    alias: number | null
-
-    // value currently stored in the register
-    value: number | null
+export interface StationWaitingArgument {
+    isReady: false
+    waitingFor: 'station'
+    reservationStationIndex: number
 }
 
-export interface DataBus {
-    // The value being broadcast. Null if no value
-    // is being broadcast at the moment.
-    value: number | null
+export interface LoadWaitingArgument {
+    isReady: false
+    waitingFor: 'load'
+    registerIndex: number
+}
 
-    // The index of the reservation station corresponding
-    // to the operation that produced this value, or null
-    // if the bus is off or the data is from memory rather
-    // than from a function unit
-    sourceStation: number | null
+export type WaitingArgument = StationWaitingArgument | LoadWaitingArgument
 
-    // The index of the register the load operation
-    // is writing to, or null if data bus is off or
-    // if the data is not from memory
-    destinationRegister: number | null
+export type ReservationStationArgument<T> = ReadyArgument<T> | WaitingArgument
+
+export interface WaitingStation<T> {
+    isEmpty: false
+    isExecuting: false
+    isReady: false
+    operation: ArithmeticOpcode
+    firstArgument: ReservationStationArgument<T>
+    secondArgument: ReservationStationArgument<T>
+}
+
+export type ReservationStationData<T> = ReadyStation<T> | WaitingStation<T> | EmptyStation
+// End ReservationStationData Type
+
+// StoreBufferData Type
+export interface EmptyStoreBuffer {
+    isEmpty: true
+    isStoring: false
+    isReady: false
+}
+
+export interface ReadyStoreBuffer<T> {
+    isEmpty: false
+    isStoring: boolean
+    isReady: true
+    address: number
+    value: T
+}
+
+export interface AddressWaitingStoreBuffer<T> {
+    isEmpty: false
+    isStoring: false
+    isReady: false
+    waitingFor: 'address'
+    waitingStaionIndex: number
+    value: T
 }
 
 
+export interface ValueWaitingStoreBuffer {
+    isEmpty: false
+    isStoring: false
+    isReady: false
+    waitingFor: 'value'
+    waitingStationIndex: number
+    address: number
+}
+
+export type WaitingStoreBuffer<T> = AddressWaitingStoreBuffer<T> | ValueWaitingStoreBuffer
+
+export type StoreBufferData<T> = ReadyStoreBuffer<T> | WaitingStoreBuffer<T> | EmptyStoreBuffer
+// End StoreBufferData Type
+
+// LoadBufferData Type
+export interface EmptyLoadBuffer {
+    isEmpty: true
+    isLoading: false
+    isReady: false
+}
+
+export interface WaitingLoadBuffer {
+    isEmpty: false
+    isLoading: false
+    isReady: false
+    waitingStationIndex: number
+}
+
+export interface ReadyLoadBuffer {
+    isEmpty: false
+    isLoading: boolean
+    isReady: true
+    address: number
+}
+
+export type LoadBufferData = ReadyLoadBuffer | WaitingLoadBuffer | EmptyLoadBuffer
+// End LoadBufferData Type
+
+// DataBus Type
+export interface IdleBus {
+    isActive: false
+}
+
+export interface ActiveLoadSignalBus<T> {
+    isActive: true
+    value: T
+    source: 'load'
+    destinationRegister: number
+}
+
+export interface ActiveOperationSignalBus<T> {
+    isActive: true
+    value: T
+    source: 'operation'
+    sourceStation: number
+}
+
+export type ActiveBus<T> = ActiveLoadSignalBus<T> | ActiveOperationSignalBus<T>
+
+export type DataBus<T> = ActiveBus<T> | IdleBus
+// End DataBus Type
+
+// FunctionUnitData Type
+export interface EmptyFunctionUnit {
+    isEmpty: true
+}
+
+export interface ActiveFunctionUnit<T> {
+    isEmpty: false
+    operation: ArithmeticOpcode
+    firstArgument: T
+    secondArgument: T
+    ticksLeft: number
+    sourceStationIndex: number
+}
+
+export type FunctionUnitData<T> = ActiveFunctionUnit<T> | EmptyFunctionUnit
+// End FunctionUnitData Type
+
+// Opcode Type
 // Subset of opcodes for arithmetic instructions
 export type ArithmeticOpcode = 'add' | 'sub' | 'mul' | 'div'
 
@@ -105,8 +192,11 @@ export type MemoryOpcode = 'ld' | 'st'
 
 // Master list of opcodes
 export type Opcode = ArithmeticOpcode | MemoryOpcode
+// End Opcode Type
 
+// Instruction Type
 export interface ArithmeticInstruction {
+    type: 'arithmetic'
     opcode: ArithmeticOpcode
     destination: number
     source1: number
@@ -114,6 +204,7 @@ export interface ArithmeticInstruction {
 }
 
 export interface MemoryInstruction {
+    type: 'memory'
     opcode: MemoryOpcode
     register: number
     baseRegister: number
@@ -121,6 +212,7 @@ export interface MemoryInstruction {
 }
 
 export type Instruction = ArithmeticInstruction | MemoryInstruction
+// End Instruction Type
 
 // Format an instruction as a string for display in the UI
 export const formatInstruction = (instruction: Instruction): string => {
@@ -139,35 +231,6 @@ export const formatInstruction = (instruction: Instruction): string => {
     }
 }
 
-export interface FunctionUnit {
-    // Which operation is being performed in this station
-    // or null if the station is empty
-    operation: '+' | '-' | '*' | '/' | null
-
-    // The value of the first argument, or null if
-    // the argument is awaiting another station or
-    // if this station is empty
-    firstArgumentValue: number | null
-
-    // The value of the second argument, or null if
-    // the argument is awaiting another station or
-    // if this station is empty
-    secondArgumentValue: number | null
-
-    // The number of cycles left in the current function
-    // execution for this unit, or null if no operation
-    // is in progress
-    ticksLeft: number | null
-
-    // The index of the reservation station that this
-    // operation was dispatched from, or null if no
-    // operation is in progress
-    sourceReservationStation: number | null
-
-    // Whether this station is empty
-    isEmpty: boolean
-}
-
 export interface SimulatorData {
     // Eventually, this will include a full copy
     // of the current state of the simulator
@@ -176,17 +239,17 @@ export interface SimulatorData {
     instructionQueue: Array<Instruction>
 
     // Values in the registers, sorted R0-RN
-    registerFile: Array<RegisterData>
+    registerFile: Array<RegisterData<number>>
 
     // Values in the reservation stations, sorted
     // from RS0-RSN
-    reservationStations: Array<ReservationStationData>
+    reservationStations: Array<ReservationStationData<number>>
 
     // Load buffers
-    loadBuffers: Array<LoadStoreBufferData>,
+    loadBuffers: Array<LoadBufferData>,
 
     // Store buffers
-    storeBuffers: Array<LoadStoreBufferData>
+    storeBuffers: Array<StoreBufferData<number>>
 
     // Number of adder reservation stations
     adderReservationStationCount: number
@@ -195,15 +258,15 @@ export interface SimulatorData {
     multiplierReservationStationCount: number
 
     // Common data bus for broadcast data
-    commonDataBus: DataBus
+    commonDataBus: DataBus<number>
 
     // Adders/subtractors for operation on values in
     // the add/sub reservation stations
-    addSubtractFunctionUnits: Array<FunctionUnit>
+    addSubtractFunctionUnits: Array<FunctionUnitData<number>>
 
     // multipliers/dividers for operation on values in
     // the mul/div reservation stations
-    multiplyDivideFunctionUnits: Array<FunctionUnit>
+    multiplyDivideFunctionUnits: Array<FunctionUnitData<number>>
 
     // Clock rate of the simulation, measured
     // in ticks per second
@@ -265,176 +328,122 @@ export class Simulation {
 
     private currentState: SimulatorData = { // TODO
         registerFile: [
-            { alias: null, value: 1.2 },
-            { alias: null, value: 4.4 },
-            { alias: null, value: 0 },
-            { alias: null, value: 0 }
+            { hasValue: true, value: 1.2 },
+            { hasValue: true, value: 4.4 },
+            { hasValue: true, value: 0 },
+            { hasValue: true, value: 0 }
         ],
         reservationStations: [
             {
-                operation: null,
-                firstArgumentValue: null,
-                firstArgumentStation: null,
-                firstArgumentWaitingRegister: null,
-                secondArgumentValue: null,
-                secondArgumentStation: null,
-                secondArgumentWaitingRegister: null,
                 isEmpty: true,
-                isExecuting: false
+                isExecuting: false,
+                isReady: false,
             },
             {
-                operation: null,
-                firstArgumentValue: null,
-                firstArgumentStation: null,
-                firstArgumentWaitingRegister: null,
-                secondArgumentValue: null,
-                secondArgumentStation: null,
-                secondArgumentWaitingRegister: null,
                 isEmpty: true,
-                isExecuting: false
+                isExecuting: false,
+                isReady: false,
             },
             {
-                operation: null,
-                firstArgumentValue: null,
-                firstArgumentStation: null,
-                firstArgumentWaitingRegister: null,
-                secondArgumentValue: null,
-                secondArgumentStation: null,
-                secondArgumentWaitingRegister: null,
                 isEmpty: true,
-                isExecuting: false
+                isExecuting: false,
+                isReady: false,
             },
             {
-                operation: null,
-                firstArgumentValue: null,
-                firstArgumentStation: null,
-                firstArgumentWaitingRegister: null,
-                secondArgumentValue: null,
-                secondArgumentStation: null,
-                secondArgumentWaitingRegister: null,
                 isEmpty: true,
-                isExecuting: false
+                isExecuting: false,
+                isReady: false,
             },
             {
-                operation: null,
-                firstArgumentValue: null,
-                firstArgumentStation: null,
-                firstArgumentWaitingRegister: null,
-                secondArgumentValue: null,
-                secondArgumentStation: null,
-                secondArgumentWaitingRegister: null,
                 isEmpty: true,
-                isExecuting: false
+                isExecuting: false,
+                isReady: false,
             },
         ],
         loadBuffers: [
             {
-                addressValue: null,
-                addressStation: null,
-                dataValue: null,
-                dataStation: null,
-                isEmpty: false
+                isEmpty: true,
+                isReady: false,
+                isLoading: false,
             },
             {
-                addressValue: null,
-                addressStation: null,
-                dataValue: null,
-                dataStation: null,
-                isEmpty: false
+                isEmpty: true,
+                isReady: false,
+                isLoading: false,
             },
             {
-                addressValue: null,
-                addressStation: null,
-                dataValue: null,
-                dataStation: null,
-                isEmpty: false
+                isEmpty: true,
+                isReady: false,
+                isLoading: false,
             },
             {
-                addressValue: null,
-                addressStation: null,
-                dataValue: null,
-                dataStation: null,
-                isEmpty: false
+                isEmpty: true,
+                isReady: false,
+                isLoading: false,
             },
         ],
         storeBuffers: [
             {
-                addressValue: null,
-                addressStation: null,
-                dataValue: null,
-                dataStation: null,
-                isEmpty: false
+                isEmpty: true,
+                isReady: false,
+                isStoring: false,
             },
             {
-                addressValue: null,
-                addressStation: null,
-                dataValue: null,
-                dataStation: null,
-                isEmpty: false
+                isEmpty: true,
+                isReady: false,
+                isStoring: false,
             },
             {
-                addressValue: null,
-                addressStation: null,
-                dataValue: null,
-                dataStation: null,
-                isEmpty: false
+                isEmpty: true,
+                isReady: false,
+                isStoring: false,
             },
             {
-                addressValue: null,
-                addressStation: null,
-                dataValue: null,
-                dataStation: null,
-                isEmpty: true
+                isEmpty: true,
+                isReady: false,
+                isStoring: false,
             },
         ],
         commonDataBus: {
-            value: null,
-            sourceStation: null,
-            destinationRegister: null
+            isActive: false
         },
         addSubtractFunctionUnits: [
             {
-                operation: null,
-                firstArgumentValue: null,
-                secondArgumentValue: null,
-                ticksLeft: null,
-                sourceReservationStation: null,
-                isEmpty: true
-            }
+                isEmpty: true,
+            },
         ],
         multiplyDivideFunctionUnits: [
             {
-                operation: null,
-                firstArgumentValue: null,
-                secondArgumentValue: null,
-                ticksLeft: null,
-                sourceReservationStation: null,
                 isEmpty: true
-            }
+            },
         ],
         adderReservationStationCount: 3,
         multiplierReservationStationCount: 2,
         clockRate: 4,
         instructionQueue: [
             {
+                type: 'arithmetic',
                 opcode: 'mul',
                 source1: 0,
                 source2: 1,
                 destination: 0
             },
             {
+                type: 'arithmetic',
                 opcode: 'add',
                 source1: 1,
                 source2: 1,
                 destination: 2
             },
             {
+                type: 'arithmetic',
                 opcode: 'sub',
                 source1: 1,
                 source2: 2,
                 destination: 2
             },
             {
+                type: 'arithmetic',
                 opcode: 'div',
                 source1: 0,
                 source2: 1,

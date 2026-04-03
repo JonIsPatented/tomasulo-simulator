@@ -1,4 +1,4 @@
-import type { FunctionUnit, ReservationStationData, SimulatorData } from "./Simulation";
+import type { FunctionUnitData, ReadyStation, ReservationStationData, SimulatorData } from "./Simulation";
 
 export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (currentState: SimulatorData) => {
 
@@ -8,26 +8,32 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
     let regFile = currentState.registerFile
     let transmitFlags = currentState.transmitFlags
 
-    if (bus.value !== null) {
-        if (bus.sourceStation !== null) {
+    if (bus.isActive) {
+        if (bus.source === 'operation') {
             transmitFlags = {
                 ...transmitFlags,
                 commonDataBusToRegisterFile: true,
             }
-            resStations = resStations.map((station, i) => {
-                const firstFromStation = station.firstArgumentStation === bus.sourceStation
-                const secondFromStation = station.secondArgumentStation === bus.sourceStation
+            resStations = resStations.map((station, i): ReservationStationData<number> => {
+
+                const firstFromStation =
+                    !station.isEmpty &&
+                    !station.isReady &&
+                    !station.firstArgument.isReady &&
+                    station.firstArgument.waitingFor === 'station' &&
+                    station.firstArgument.reservationStationIndex === bus.sourceStation
+
+                const secondFromStation =
+                    !station.isEmpty &&
+                    !station.isReady &&
+                    !station.secondArgument.isReady &&
+                    station.secondArgument.waitingFor === 'station' &&
+                    station.secondArgument.reservationStationIndex === bus.sourceStation
 
                 if (i === bus.sourceStation)
                     return {
-                        operation: null,
-                        firstArgumentValue: null,
-                        firstArgumentStation: null,
-                        firstArgumentWaitingRegister: null,
-                        secondArgumentValue: null,
-                        secondArgumentStation: null,
-                        secondArgumentWaitingRegister: null,
                         isEmpty: true,
+                        isReady: false,
                         isExecuting: false,
                     }
 
@@ -37,37 +43,85 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
                         commonDataBusToReservationStations: true,
                     }
 
-                return {
+                return !firstFromStation && !secondFromStation ? {
                     ...station,
-                    firstArgumentValue: firstFromStation ? bus.value : station.firstArgumentValue,
-                    firstArgumentStation: firstFromStation ? null : station.firstArgumentStation,
-                    firstArgumentWaitingRegister: firstFromStation ? null : station.firstArgumentWaitingRegister,
-
-                    secondArgumentValue: secondFromStation ? bus.value : station.secondArgumentValue,
-                    secondArgumentStation: secondFromStation ? null : station.secondArgumentStation,
-                    secondArgumentWaitingRegister: secondFromStation ? null : station.secondArgumentWaitingRegister,
+                } : firstFromStation && station.secondArgument.isReady ? {
+                    isReady: true,
+                    isEmpty: false,
+                    isExecuting: false,
+                    operation: station.operation,
+                    firstArgument: bus.value,
+                    secondArgument: station.secondArgument.value,
+                } : station.firstArgument.isReady ? {
+                    isReady: true,
+                    isEmpty: false,
+                    isExecuting: false,
+                    operation: station.operation,
+                    firstArgument: station.firstArgument.value,
+                    secondArgument: bus.value,
+                } : firstFromStation && secondFromStation ? {
+                    isReady: true,
+                    isEmpty: false,
+                    isExecuting: false,
+                    operation: station.operation,
+                    firstArgument: bus.value,
+                    secondArgument: bus.value,
+                } : firstFromStation ? {
+                    isReady: false,
+                    isEmpty: false,
+                    isExecuting: false,
+                    operation: station.operation,
+                    firstArgument: {
+                        isReady: true,
+                        value: bus.value,
+                    },
+                    secondArgument: {
+                        ...station.secondArgument
+                    }
+                } : {
+                    isReady: false,
+                    isEmpty: false,
+                    isExecuting: false,
+                    operation: station.operation,
+                    firstArgument: {
+                        ...station.firstArgument
+                    },
+                    secondArgument: {
+                        isReady: true,
+                        value: bus.value,
+                    },
                 }
             })
             regFile = regFile.map((register) => {
-                if (register.alias === bus.sourceStation) {
+                if (!register.hasValue && register.alias === bus.sourceStation) {
                     return {
-                        ...register,
+                        hasValue: true,
                         value: bus.value,
-                        alias: null
                     }
                 }
                 return register
             })
         }
-        else if (bus.destinationRegister !== null) {
+        else if (bus.source === 'load') {
             transmitFlags = {
                 ...transmitFlags,
                 commonDataBusToLoadStoreUnits: true,
                 commonDataBusToReservationStations: true,
             }
             resStations = resStations.map((station) => {
-                const firstFromRegister = station.firstArgumentWaitingRegister === bus.destinationRegister
-                const secondFromRegister = station.secondArgumentWaitingRegister === bus.destinationRegister
+                const firstFromRegister =
+                    !station.isEmpty &&
+                    !station.isReady &&
+                    !station.firstArgument.isReady &&
+                    station.firstArgument.waitingFor === 'load' &&
+                    station.firstArgument.registerIndex === bus.destinationRegister
+
+                const secondFromRegister =
+                    !station.isEmpty &&
+                    !station.isReady &&
+                    !station.secondArgument.isReady &&
+                    station.secondArgument.waitingFor === 'load' &&
+                    station.secondArgument.registerIndex === bus.destinationRegister
 
                 if (firstFromRegister || secondFromRegister)
                     transmitFlags = {
@@ -75,21 +129,60 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
                         commonDataBusToReservationStations: true,
                     }
 
-                return {
+                return !firstFromRegister && !secondFromRegister ? {
                     ...station,
-                    firstArgumentValue: firstFromRegister ? bus.value : station.firstArgumentValue,
-                    firstArgumentWaitingRegister: firstFromRegister ? null : station.firstArgumentWaitingRegister,
-
-                    secondArgumentValue: secondFromRegister ? bus.value : station.secondArgumentValue,
-                    secondArgumentWaitingRegister: secondFromRegister ? null : station.secondArgumentWaitingRegister
+                } : firstFromRegister && station.secondArgument.isReady ? {
+                    isReady: true,
+                    isEmpty: false,
+                    isExecuting: false,
+                    operation: station.operation,
+                    firstArgument: bus.value,
+                    secondArgument: station.secondArgument.value,
+                } : station.firstArgument.isReady ? {
+                    isReady: true,
+                    isEmpty: false,
+                    isExecuting: false,
+                    operation: station.operation,
+                    firstArgument: station.firstArgument.value,
+                    secondArgument: bus.value,
+                } : firstFromRegister && secondFromRegister ? {
+                    isReady: true,
+                    isEmpty: false,
+                    isExecuting: false,
+                    operation: station.operation,
+                    firstArgument: bus.value,
+                    secondArgument: bus.value,
+                } : firstFromRegister ? {
+                    isReady: false,
+                    isEmpty: false,
+                    isExecuting: false,
+                    operation: station.operation,
+                    firstArgument: {
+                        isReady: true,
+                        value: bus.value,
+                    },
+                    secondArgument: {
+                        ...station.secondArgument
+                    }
+                } : {
+                    isReady: false,
+                    isEmpty: false,
+                    isExecuting: false,
+                    operation: station.operation,
+                    firstArgument: {
+                        ...station.firstArgument
+                    },
+                    secondArgument: {
+                        isReady: true,
+                        value: bus.value,
+                    },
                 }
             })
             regFile = regFile.map((register, i) => {
-                if (i === bus.destinationRegister) {
+                if (bus.source === 'load' && i === bus.destinationRegister) {
                     return {
-                        ...register,
+                        hasValue: true,
                         value: bus.value,
-                        alias: null
                     }
                 }
                 return register
@@ -97,19 +190,22 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
         }
     }
 
-    const isReady = (station: ReservationStationData) =>
-        !station.isEmpty &&
-        !station.isExecuting &&
-        station.firstArgumentValue !== null &&
-        station.secondArgumentValue !== null
-
-    const readyStationsByIndex = resStations.map((station, i) => {
+    const readyStationsByIndex: Array<{
+        station: ReadyStation<number>,
+        index: number,
+    }> = resStations.map((station, i) => {
         return { station, i }
-    }).filter(stationByIndex => isReady(stationByIndex.station))
+    }).filter(
+        stationByIndex => stationByIndex.station.isReady
+    ).map(stationByIndex => {
+        return {
+            station: stationByIndex.station as ReadyStation<number>,
+            index: stationByIndex.i
+        }
+    })
 
-    const dec = (fu: FunctionUnit) => {
-        if (fu.ticksLeft === null) return fu
-        if (fu.ticksLeft === 0) return fu
+    const dec = (fu: FunctionUnitData<number>) => {
+        if (fu.isEmpty || fu.ticksLeft === 0) return fu
         return {
             ...fu,
             ticksLeft: fu.ticksLeft - 1
@@ -134,7 +230,7 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
     if (addSubFuncUnits[0].isEmpty) {
         const readyAddSubStation = readyStationsByIndex.find(
             stationByIndex => {
-                return stationByIndex.i <
+                return stationByIndex.index <
                     currentState.adderReservationStationCount
             }
         )
@@ -143,17 +239,16 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
             addSubFuncUnits = [
                 {
                     operation: station.operation,
-                    firstArgumentValue: station.firstArgumentValue,
-                    secondArgumentValue: station.secondArgumentValue,
-                    sourceReservationStation: readyAddSubStation.i,
+                    firstArgument: station.firstArgument,
+                    secondArgument: station.secondArgument,
+                    sourceStationIndex: readyAddSubStation.index,
                     ticksLeft: 2,
                     isEmpty: false
                 }
             ]
 
             resStations = resStations.map((s, i) => {
-                if (i === readyAddSubStation.i) {
-                    console.log("MARKED AS EXECUTING")
+                if (s.isReady && i === readyAddSubStation.index) {
                     return {
                         ...s,
                         isExecuting: true
@@ -169,7 +264,7 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
     if (mulDivFuncUnits[0].isEmpty) {
         const readyMulDivStation = readyStationsByIndex.find(
             stationByIndex => {
-                return stationByIndex.i >=
+                return stationByIndex.index >=
                     currentState.adderReservationStationCount
             }
         )
@@ -178,16 +273,16 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
             mulDivFuncUnits = [
                 {
                     operation: station.operation,
-                    firstArgumentValue: station.firstArgumentValue,
-                    secondArgumentValue: station.secondArgumentValue,
-                    sourceReservationStation: readyMulDivStation.i,
-                    ticksLeft: station.operation == '*' ? 10 : 40,
+                    firstArgument: station.firstArgument,
+                    secondArgument: station.secondArgument,
+                    sourceStationIndex: readyMulDivStation.index,
+                    ticksLeft: station.operation == 'mul' ? 10 : 40,
                     isEmpty: false
                 }
             ]
 
             resStations = resStations.map((s, i) => {
-                if (i === readyMulDivStation.i) {
+                if (s.isReady && i === readyMulDivStation.index) {
                     return {
                         ...s,
                         isExecuting: true

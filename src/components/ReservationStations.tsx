@@ -1,5 +1,5 @@
 import { useSimulation } from '../hooks/useSimulation'
-import { type ReservationStationData } from '../simulation/Simulation'
+import { type ReservationStationArgument, type ReservationStationData } from '../simulation/Simulation'
 import { Flex, Grid, Text } from '@radix-ui/themes'
 
 const RSGroup = ({
@@ -8,7 +8,7 @@ const RSGroup = ({
     start
 }: {
     title: string
-    stations: ReservationStationData[],
+    stations: Array<ReservationStationData<number>>,
     start: number
 }) => {
     return (
@@ -38,21 +38,26 @@ const RSRow = ({
     rs,
     index
 }: {
-    rs: ReservationStationData
+    rs: ReservationStationData<number>
     index: number
 }) => {
-    const getValue = (value: number | null, station: number | null) => {
-        if (value !== null) return value
-        if (station !== null) return `RS${station}`
+    const getValue = (argument: number | ReservationStationArgument<number>) => {
+        if (typeof argument === 'number') return argument.toString()
+        if (argument.isReady)
+            return argument.value.toString()
+        if (!argument.isReady && argument.waitingFor == 'station')
+            return `RS${argument.reservationStationIndex}`
+        if (!argument.isReady && argument.waitingFor == 'load')
+            return `f${argument.registerIndex}`
         return '-'
     }
 
     const status =
         rs.isEmpty
             ? 'Free'
-            : (rs.isExecuting)
+            : rs.isExecuting
                 ? 'Running'
-                : (rs.firstArgumentValue !== null && rs.secondArgumentValue !== null)
+                : rs.isReady
                     ? 'Ready'
                     : 'Waiting'
 
@@ -68,13 +73,13 @@ const RSRow = ({
                 RS{index}
             </Text>
             <Text className="border-b border-gray-100 py-1">
-                {rs.operation ?? '-'}
+                {rs.isEmpty ? '-' : rs.operation}
             </Text>
             <Text className="border-b border-gray-100 py-1">
-                {getValue(rs.firstArgumentValue, rs.firstArgumentStation)}
+                {rs.isEmpty ? '-' : getValue(rs.firstArgument)}
             </Text>
             <Text className="border-b border-gray-100 py-1">
-                {getValue(rs.secondArgumentValue, rs.secondArgumentStation)}
+                {rs.isEmpty ? '-' : getValue(rs.secondArgument)}
             </Text>
             <Text
                 color={color}

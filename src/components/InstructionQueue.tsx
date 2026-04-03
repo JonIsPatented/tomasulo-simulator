@@ -8,7 +8,7 @@ export const InstructionQueue = () => {
         <Flex direction="column">
             {queueData.map((instr, i) => {
                 // Render a memory instruction if it contains a base register, otherwise render an ALU instruction
-                if ('baseRegister' in instr) {
+                if (instr.type === 'memory') {
                     return (
                         <Flex key={`instr-${i}`} direction="row" gap="2">
                             <div>{instr.opcode}</div>
