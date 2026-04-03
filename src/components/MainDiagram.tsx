@@ -102,56 +102,56 @@ export const MainDiagram = () => {
 
     return (
         <div ref={containerRef} className='h-full p-4 relative'>
-            <div className='grid grid-cols-12 gap-8 auto-rows-auto'>
+            <div className='grid grid-cols-12 gap-4 auto-rows-auto'>
 
-                {/* Controls */}
-                <div className='col-span-12'>
-                    <TitleBar />
-                </div>
-                {/* Instruction Queue */}
-                <div className='col-start-5 col-span-4'>
-                    <Section ref={instructionQueueRef} title='Instruction Queue'>
-                        <InstructionQueue />
-                    </Section>
-                </div>
+            {/* Title Bar - full width */}
+            <div className='col-span-12'>
+                <TitleBar />
+            </div>
 
-                {/* Register File */}
-                <div className='row-start-3 col-span-3'>
-                    <Section ref={registerFileRef} title='Register File'>
-                        <RegisterFile />
-                    </Section>
-                </div>
+            {/* Register File  */}
+            <div className='col-span-3 row-span-3'>
+                <Section ref={registerFileRef} title='Register File'>
+                    <RegisterFile />
+                </Section>
+            </div>
 
-                {/* Reservation Stations */}
-                <div className='col-span-6'>
-                    <Section ref={reservationStationsRef} title='Reservation Stations'>
-                        <ReservationStations />
-                    </Section>
-                </div>
+            {/* Instruction Queue */}
+            <div className='col-span-9 h-45'>
+                <Section ref={instructionQueueRef} title='Instruction Queue'>
+                    <InstructionQueue />
+                </Section>
+            </div>
 
-                {/* Load / Store Buffers */}
-                <div className='col-span-3'>
-                    <Section ref={loadStoreBuffersRef} title='Load / Store Buffers'>
-                        <Buffers />
-                    </Section>
-                </div>
+            {/* Reservation Stations */}
+            <div className='col-span-9'>
+                <Section ref={reservationStationsRef} title='Reservation Stations'>
+                    <ReservationStations />
+                </Section>
+            </div>
 
-                {/* Functional Units */}
-                <div className='col-span-5 col-start-5'>
-                    <Section ref={functionUnitRef} title='Functional Units'>
-                        <FuncUnits />
-                    </Section>
-                </div>
+            {/* Functional Units */}
+            <div className='col-span-6 h-67'>
+                <Section ref={functionUnitRef} title='Functional Units'>
+                    <FuncUnits />
+                </Section>
+            </div>
 
-                {/* Common Data Bus */}
-                <div className='col-span-12'>
-                    <Flex justify='center'>
-                        <CommonDataBus ref={commonDataBusRef} />
-                    </Flex>
-                </div>
+            {/* Load/Store Buffer */}
+            <div className='col-span-3 h-67'>
+                <Section ref={loadStoreBuffersRef} title='Load / Store Buffers'>
+                    <Buffers />
+                </Section>
+            </div>
+
+            {/* Common Data Bus - full width at bottom */}
+            <div className='col-span-12'>
+                <Flex justify='center'>
+                    <CommonDataBus ref={commonDataBusRef} />
+                </Flex>
+            </div>
 
             </div>
-            {positions && <WiringOverlay {...positions} />}
         </div>
     )
 }
