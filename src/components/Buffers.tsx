@@ -1,6 +1,6 @@
 import { useSimulation } from "../hooks/useSimulation";
 import { Flex, Grid, Text } from "@radix-ui/themes";
-import type { LoadStoreBufferData } from "../simulation/Simulation";
+import type { LoadBufferData, StoreBufferData } from "../simulation/Simulation";
 
 const BGroup = ({
     title,
@@ -8,7 +8,7 @@ const BGroup = ({
     start
 }: {
     title: string
-    buffers: LoadStoreBufferData[]
+    buffers: Array<LoadBufferData | StoreBufferData<number>>
     start: number
 }) => {
     return (
@@ -31,7 +31,7 @@ const BRow = ({
     b,
     index
 }: {
-    b: LoadStoreBufferData
+    b: LoadBufferData | StoreBufferData<number>
     index: number
 }) => {
     return (
@@ -40,18 +40,18 @@ const BRow = ({
                 B{index}
             </Text>
             <Text className="border-b border-gray-100 py-1">
-                {b.addressValue ?? '-'}
+                {b.isReady ? b.address : '-'}
             </Text>
         </>)
 }
 export const Buffers = () => {
-    const [loadBuffers, StoreBuffers] = useSimulation(
+    const [loadBuffers, storeBuffers] = useSimulation(
         (data) => [data.loadBuffers, data.storeBuffers]
     );
     return (
         <Grid columns="2" gap="4">
             <BGroup title="load" buffers={loadBuffers} start={0} />
-            <BGroup title="store" buffers={StoreBuffers} start={loadBuffers.length} />
+            <BGroup title="store" buffers={storeBuffers} start={loadBuffers.length} />
         </Grid>
     )
 }

@@ -2,20 +2,6 @@ import { broadcastStep } from './Broadcast.tsx'
 import { dispatchStep } from './Dispatch.tsx'
 import { issueStep } from './Issue.tsx'
 
-// Result Type
-export interface Success<T> {
-    ok: true
-    value: T
-}
-
-export interface Failure<E> {
-    ok: false
-    error: E
-}
-
-export type Result<T, E> = Success<T> | Failure<E>
-// End Result Type
-
 // RegisterData Type
 export interface ValueRegister<T> {
     hasValue: true
