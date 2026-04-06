@@ -13,12 +13,12 @@ export const issueStep = (currentState: SimulatorData): SimulatorData => {
     let regFile = [...currentState.registerFile]
 
     const isAddSub =
-        instruction.opcode === 'ADD' ||
-        instruction.opcode === 'SUB'
+        instruction.opcode === 'add' ||
+        instruction.opcode === 'sub'
 
     const isMulDiv =
-        instruction.opcode === 'MUL' ||
-        instruction.opcode === 'DIV'
+        instruction.opcode === 'mul' ||
+        instruction.opcode === 'div'
 
     // Ignore LD/ST for now
     if (!isAddSub && !isMulDiv) {
@@ -45,70 +45,110 @@ export const issueStep = (currentState: SimulatorData): SimulatorData => {
         instructionQueueToReservationStations: true
     }
 
-    const getOperand = (regIndex: number) => {
+    const getOperand = (regIndex: number): {
+        value?: number,
+        station?: number,
+        waitingRegister?: number,
+    } => {
         const reg = regFile[regIndex]
 
-        if (reg.alias !== null) {
+        if (!reg.hasValue) {
             return {
-                value: null,
                 station: reg.alias,
-                waitingRegister: null
-            }
-        }
-
-        if (reg.value !== null) {
-
-            newTransmitFlags = {
-                ...newTransmitFlags,
-                registerFileToReservationStations: true
-            }
-
-            return {
-                value: reg.value,
-                station: null,
-                waitingRegister: null
             }
         }
 
         newTransmitFlags = {
             ...newTransmitFlags,
-            loadStoreBuffersToReservationStations: true
+            registerFileToReservationStations: true
         }
 
         return {
-            value: null,
-            station: null,
-            waitingRegister: regIndex
+            value: reg.value,
         }
     }
 
     const op1 = getOperand(instruction.source1)
     const op2 = getOperand(instruction.source2)
 
-    const opMap = {
-        ADD: '+',
-        SUB: '-',
-        MUL: '*',
-        DIV: '/'
-    } as const
+    const bothReady = op1.value !== undefined && op2.value !== undefined
+    const neitherReady = op1.value === undefined && op2.value === undefined
+    const atLeastOneReady = !neitherReady
+    const exactlyOneReady = !bothReady && atLeastOneReady
+    const onlyFirstReady = exactlyOneReady && op1.value !== undefined
 
-    resStations[freeIndex] = {
-        operation: opMap[instruction.opcode as keyof typeof opMap],
-        firstArgumentValue: op1.value,
-        firstArgumentStation: op1.station,
-        firstArgumentWaitingRegister: op1.waitingRegister,
-        secondArgumentValue: op2.value,
-        secondArgumentStation: op2.station,
-        secondArgumentWaitingRegister: op2.waitingRegister,
+    resStations[freeIndex] = bothReady ? {
         isEmpty: false,
-        isExecuting: false
+        isExecuting: false,
+        isReady: true,
+        operation: instruction.opcode,
+        firstArgument: op1.value!,
+        secondArgument: op2.value!,
+    } : neitherReady ? {
+        isEmpty: false,
+        isExecuting: false,
+        isReady: false,
+        operation: instruction.opcode,
+        firstArgument: op1.station !== undefined ? {
+            isReady: false,
+            waitingFor: 'station',
+            reservationStationIndex: op1.station!,
+        } : {
+            isReady: false,
+            waitingFor: 'load',
+            registerIndex: op1.waitingRegister!,
+        },
+        secondArgument: op2.station !== undefined ? {
+            isReady: false,
+            waitingFor: 'station',
+            reservationStationIndex: op2.station!,
+        } : {
+            isReady: false,
+            waitingFor: 'load',
+            registerIndex: op2.waitingRegister!,
+        }
+    } : onlyFirstReady ? {
+        isEmpty: false,
+        isExecuting: false,
+        isReady: false,
+        operation: instruction.opcode,
+        firstArgument: {
+            isReady: true,
+            value: op1.value!,
+        },
+        secondArgument: op2.station !== undefined ? {
+            isReady: false,
+            waitingFor: 'station',
+            reservationStationIndex: op2.station!,
+        } : {
+            isReady: false,
+            waitingFor: 'load',
+            registerIndex: op2.waitingRegister!,
+        }
+    } : { // onlySecondReady
+        isEmpty: false,
+        isExecuting: false,
+        isReady: false,
+        operation: instruction.opcode,
+        firstArgument: op1.station !== undefined ? {
+            isReady: false,
+            waitingFor: 'station',
+            reservationStationIndex: op1.station!,
+        } : {
+            isReady: false,
+            waitingFor: 'load',
+            registerIndex: op1.waitingRegister!,
+        },
+        secondArgument: {
+            isReady: true,
+            value: op2.value!,
+        }
     }
 
     // Register renaming (only if not store)
     regFile[instruction.destination] = {
-        ...regFile[instruction.destination],
+        hasValue: false,
         alias: freeIndex,
-        value: null
     }
 
     return {

@@ -35,7 +35,16 @@ const FuncUnitRows = ({unit,addOrMull}:{unit:FunctionUnit,addOrMull:String}) =>{
     )
 }
 export const FuncUnits = () => {
-    const [MDF, ASF] = useSimulation((data) => [data.multiplyDivideFunctionUnits, data.addSubtractFunctionUnits])
+    const {
+        mulDivFuncUnits,
+        addSubFuncUnits,
+    } = useSimulation((data) => {
+        return {
+            mulDivFuncUnits: data.multiplyDivideFunctionUnits,
+            addSubFuncUnits: data.addSubtractFunctionUnits,
+        }
+    })
+
     return (
 
         <Grid columns="2" gap="2">
