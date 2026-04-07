@@ -170,7 +170,7 @@ export const WiringOverlay = ({
                     x: (right(loadStoreBuffers).x + top(loadStoreBuffers).x) / 2
                 }}
                 orthogonalDirection="vertical"
-                active={transmitFlags.commonDataBusToReservationStations}
+                active={transmitFlags.storeBuffersToMemoryUnit}
             />
 
             <Wire
@@ -183,7 +183,7 @@ export const WiringOverlay = ({
                     x: (left(loadStoreBuffers).x + top(loadStoreBuffers).x) / 2
                 }}
                 orthogonalDirection="vertical"
-                active={transmitFlags.commonDataBusToReservationStations}
+                active={transmitFlags.memoryUnitToLoadBuffers}
             />
         </svg>
     )
