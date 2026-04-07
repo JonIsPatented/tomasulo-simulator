@@ -289,6 +289,10 @@ export interface SimulatorData {
     // Number of cycles taken to perform each
     // type of instruction
     cyclesPerInstruction: InstructionDurations
+
+    // A flag to indicate whether a simulation has begun
+    // since the last reset
+    running: boolean
 }
 
 export class Simulation {
@@ -406,13 +410,15 @@ export class Simulation {
     // adjustment: A function that takes in the old durations as
     // an argument and returns the desired durations
     // returns: A Result containing the new durations on
-    // a success and an error message on a failure
+    // a success and an error code on a failure
     public readonly adjustInstructionDurations = (
         adjustment: (durations: InstructionDurations) => InstructionDurations
-    ): Result<InstructionDurations, 'Duration cannot be less than 0'> => {
+    ): Result<InstructionDurations, 'NEGATIVE_DURATION' | 'ALREADY_RUNNING'> => {
+        if (this.currentState.running)
+            return failure('ALREADY_RUNNING')
         const newDurations = adjustment(this.currentState.cyclesPerInstruction)
         if (Object.entries(newDurations).find(e => e[1] < 0))
-            return failure('Duration cannot be less than 0')
+            return failure('NEGATIVE_DURATION')
         this.currentState = {
             ...this.currentState,
             cyclesPerInstruction: newDurations
@@ -422,6 +428,7 @@ export class Simulation {
 
     private readonly tick = () => {
         this.currentState = [this.currentState]
+            .map(setRunning)
             .map(resetTransmitFlags)
             .map(issueStep)
             .map(dispatchStep)
@@ -434,7 +441,14 @@ export class Simulation {
     }
 }
 
-const resetTransmitFlags = (data: SimulatorData) => {
+const setRunning = (data: SimulatorData): SimulatorData => (
+    data.running ? data : {
+        ...data,
+        running: true
+    }
+)
+
+const resetTransmitFlags = (data: SimulatorData): SimulatorData => {
     return {
         ...data,
         transmitFlags: {
@@ -567,4 +581,5 @@ const defaultState = (): SimulatorData => ({
         loading: 4,
         storing: 4,
     },
+    running: false,
 })
