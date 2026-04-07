@@ -423,6 +423,7 @@ export class Simulation {
             ...this.currentState,
             cyclesPerInstruction: newDurations
         }
+        this.publish()
         return success(newDurations)
     }
 
