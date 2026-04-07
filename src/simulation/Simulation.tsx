@@ -1,3 +1,4 @@
+import { failure, success, type Result } from '../util/Result.tsx'
 import { broadcastStep } from './Broadcast.tsx'
 import { dispatchStep } from './Dispatch.tsx'
 import { issueStep } from './Issue.tsx'
@@ -217,6 +218,17 @@ export const formatInstruction = (instruction: Instruction): string => {
     }
 }
 
+// Number of cycles each of the listed
+// instructions takes to complete
+export interface InstructionDurations {
+    addition: number,
+    subtraction: number,
+    multiplication: number,
+    division: number,
+    loading: number,
+    storing: number,
+}
+
 export interface SimulatorData {
     // Eventually, this will include a full copy
     // of the current state of the simulator
@@ -276,14 +288,7 @@ export interface SimulatorData {
 
     // Number of cycles taken to perform each
     // type of instruction
-    cyclesPerInstruction: {
-        addition: number,
-        subtraction: number,
-        multiplication: number,
-        division: number,
-        loading: number,
-        storing: number,
-    }
+    cyclesPerInstruction: InstructionDurations
 }
 
 export class Simulation {
@@ -395,6 +400,24 @@ export class Simulation {
         this.currentState.clockRate = newRatePerSecond
         if (wasRunning) this.startClock()
         this.publish()
+    }
+
+    // Change how long each type of instruction takes to perform
+    // adjustment: A function that takes in the old durations as
+    // an argument and returns the desired durations
+    // returns: A Result containing the new durations on
+    // a success and an error message on a failure
+    public readonly adjustInstructionDurations = (
+        adjustment: (durations: InstructionDurations) => InstructionDurations
+    ): Result<InstructionDurations, 'Duration cannot be less than 0'> => {
+        const newDurations = adjustment(this.currentState.cyclesPerInstruction)
+        if (Object.entries(newDurations).find(e => e[1] < 0))
+            return failure('Duration cannot be less than 0')
+        this.currentState = {
+            ...this.currentState,
+            cyclesPerInstruction: newDurations
+        }
+        return success(newDurations)
     }
 
     private readonly tick = () => {
