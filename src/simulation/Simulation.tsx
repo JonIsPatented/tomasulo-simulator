@@ -270,6 +270,8 @@ export interface SimulatorData {
         commonDataBusToRegisterFile: boolean,
         commonDataBusToLoadStoreUnits: boolean,
         commonDataBusToReservationStations: boolean,
+        storeBuffersToMemoryUnit: boolean,
+        memoryUnitToLoadBuffers: boolean,
     }
 }
 
@@ -445,6 +447,8 @@ export class Simulation {
             commonDataBusToRegisterFile: false,
             commonDataBusToLoadStoreUnits: false,
             commonDataBusToReservationStations: false,
+            storeBuffersToMemoryUnit: false,
+            memoryUnitToLoadBuffers: false,
         }
 
     }
@@ -483,21 +487,7 @@ export class Simulation {
 
     private readonly tick = () => {
         this.currentState = [this.currentState]
-            .map(data => {
-                return {
-                    ...data,
-                    transmitFlags: {
-                        registerFileToReservationStations: false,
-                        loadStoreBuffersToReservationStations: false,
-                        reservationStationsToFunctionUnits: false,
-                        instructionQueueToReservationStations: false,
-                        functionUnitsToCommonDataBus: false,
-                        commonDataBusToRegisterFile: false,
-                        commonDataBusToLoadStoreUnits: false,
-                        commonDataBusToReservationStations: false,
-                    }
-                }
-            })
+            .map(resetTransmitFlags)
             .map(issueStep)
             .map(dispatchStep)
             .map(broadcastStep)[0]
@@ -506,5 +496,23 @@ export class Simulation {
     public readonly step = () => {
         this.tick()
         this.publish()
+    }
+}
+
+const resetTransmitFlags = (data: SimulatorData) => {
+    return {
+        ...data,
+        transmitFlags: {
+            registerFileToReservationStations: false,
+            loadStoreBuffersToReservationStations: false,
+            reservationStationsToFunctionUnits: false,
+            instructionQueueToReservationStations: false,
+            functionUnitsToCommonDataBus: false,
+            commonDataBusToRegisterFile: false,
+            commonDataBusToLoadStoreUnits: false,
+            commonDataBusToReservationStations: false,
+            storeBuffersToMemoryUnit: false,
+            memoryUnitToLoadBuffers: false,
+        }
     }
 }

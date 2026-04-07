@@ -2,16 +2,16 @@ import { Section } from './Section'
 import { RegisterFile } from './RegisterFile'
 import { FuncUnits } from './FuncUnits'
 import { ReservationStations } from './ReservationStations'
-
 import { TitleBar } from './TitleBar'
 import { CommonDataBus } from './CommonDataBus'
-
 import { Buffers } from './Buffers'
 import { Flex } from '@radix-ui/themes'
 import { InstructionQueue } from './InstructionQueue'
-import { useLayoutEffect, useRef, useState } from 'react'
-
+import { MemoryUnit } from './MemoryUnit'
+import { InstructionHistory } from './InstructionHistory'
 import { type Position, WiringOverlay } from './WiringOverlay'
+
+import { useLayoutEffect, useRef, useState } from 'react'
 
 export const MainDiagram = () => {
 
@@ -23,6 +23,7 @@ export const MainDiagram = () => {
     const functionUnitRef = useRef<HTMLDivElement | null>(null)
     const instructionQueueRef = useRef<HTMLDivElement | null>(null)
     const commonDataBusRef = useRef<HTMLDivElement | null>(null)
+    const memoryUnitRef = useRef<HTMLDivElement | null>(null)
 
     const [positions, setPositions] = useState<{
         registerFile: Position,
@@ -31,6 +32,7 @@ export const MainDiagram = () => {
         functionUnits: Position,
         instructionQueue: Position,
         commonDataBus: Position,
+        memoryUnit: Position,
     } | undefined>()
 
     useLayoutEffect(() => {
@@ -41,6 +43,7 @@ export const MainDiagram = () => {
         const functionUnits = functionUnitRef.current
         const instructionQueue = instructionQueueRef.current
         const commonDataBus = commonDataBusRef.current
+        const memoryUnit = memoryUnitRef.current
 
         if (
             !container ||
@@ -49,10 +52,9 @@ export const MainDiagram = () => {
             !loadStoreBuffers ||
             !functionUnits ||
             !instructionQueue ||
-            !commonDataBus
-        ) {
-            return
-        }
+            !commonDataBus ||
+            !memoryUnit
+        ) return
 
         const getPosition = (element: Element) => {
             const rect = element.getBoundingClientRect()
@@ -73,7 +75,8 @@ export const MainDiagram = () => {
                 loadStoreBuffers: getPosition(loadStoreBuffers),
                 functionUnits: getPosition(functionUnits),
                 instructionQueue: getPosition(instructionQueue),
-                commonDataBus: getPosition(commonDataBus)
+                commonDataBus: getPosition(commonDataBus),
+                memoryUnit: getPosition(memoryUnit)
             })
         }
 
@@ -91,6 +94,7 @@ export const MainDiagram = () => {
         observer.observe(functionUnits)
         observer.observe(instructionQueue)
         observer.observe(commonDataBus)
+        observer.observe(memoryUnit)
 
         updatePositions()
 
@@ -108,10 +112,25 @@ export const MainDiagram = () => {
                 <div className='col-span-12'>
                     <TitleBar />
                 </div>
+
+                {/* Instruction History */}
+                <div className='col-span-4'>
+                    <Section title='Instruction History'>
+                        <InstructionHistory />
+                    </Section>
+                </div>
+
                 {/* Instruction Queue */}
-                <div className='col-start-5 col-span-4'>
+                <div className='col-span-4'>
                     <Section ref={instructionQueueRef} title='Instruction Queue'>
                         <InstructionQueue />
+                    </Section>
+                </div>
+
+                {/* Memory Unit */}
+                <div className='col-span-4'>
+                    <Section ref={memoryUnitRef} title='Memory Unit'>
+                        <MemoryUnit />
                     </Section>
                 </div>
 
