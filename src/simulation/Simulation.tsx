@@ -273,6 +273,17 @@ export interface SimulatorData {
         storeBuffersToMemoryUnit: boolean,
         memoryUnitToLoadBuffers: boolean,
     }
+
+    // Number of cycles taken to perform each
+    // type of instruction
+    cyclesPerInstruction: {
+        addition: number,
+        subtraction: number,
+        multiplication: number,
+        division: number,
+        loading: number,
+        storing: number,
+    }
 }
 
 export class Simulation {
@@ -315,99 +326,13 @@ export class Simulation {
     }
 
     private currentState: SimulatorData = { // TODO
+        ...defaultState(),
         registerFile: [
             { hasValue: true, value: 1.2 },
             { hasValue: true, value: 4.4 },
             { hasValue: true, value: 0 },
             { hasValue: true, value: 0 }
         ],
-        reservationStations: [
-            {
-                isEmpty: true,
-                isExecuting: false,
-                isReady: false,
-            },
-            {
-                isEmpty: true,
-                isExecuting: false,
-                isReady: false,
-            },
-            {
-                isEmpty: true,
-                isExecuting: false,
-                isReady: false,
-            },
-            {
-                isEmpty: true,
-                isExecuting: false,
-                isReady: false,
-            },
-            {
-                isEmpty: true,
-                isExecuting: false,
-                isReady: false,
-            },
-        ],
-        loadBuffers: [
-            {
-                isEmpty: true,
-                isReady: false,
-                isLoading: false,
-            },
-            {
-                isEmpty: true,
-                isReady: false,
-                isLoading: false,
-            },
-            {
-                isEmpty: true,
-                isReady: false,
-                isLoading: false,
-            },
-            {
-                isEmpty: true,
-                isReady: false,
-                isLoading: false,
-            },
-        ],
-        storeBuffers: [
-            {
-                isEmpty: true,
-                isReady: false,
-                isStoring: false,
-            },
-            {
-                isEmpty: true,
-                isReady: false,
-                isStoring: false,
-            },
-            {
-                isEmpty: true,
-                isReady: false,
-                isStoring: false,
-            },
-            {
-                isEmpty: true,
-                isReady: false,
-                isStoring: false,
-            },
-        ],
-        commonDataBus: {
-            isActive: false
-        },
-        addSubtractFunctionUnits: [
-            {
-                isEmpty: true,
-            },
-        ],
-        multiplyDivideFunctionUnits: [
-            {
-                isEmpty: true
-            },
-        ],
-        adderReservationStationCount: 3,
-        multiplierReservationStationCount: 2,
-        clockRate: 4,
         instructionQueue: [
             {
                 type: 'arithmetic',
@@ -438,19 +363,6 @@ export class Simulation {
                 destination: 3
             }
         ],
-        transmitFlags: {
-            registerFileToReservationStations: false,
-            loadStoreBuffersToReservationStations: false,
-            reservationStationsToFunctionUnits: false,
-            instructionQueueToReservationStations: false,
-            functionUnitsToCommonDataBus: false,
-            commonDataBusToRegisterFile: false,
-            commonDataBusToLoadStoreUnits: false,
-            commonDataBusToReservationStations: false,
-            storeBuffersToMemoryUnit: false,
-            memoryUnitToLoadBuffers: false,
-        }
-
     }
 
     public readonly getSimulatorData = (): SimulatorData => {
@@ -516,3 +428,120 @@ const resetTransmitFlags = (data: SimulatorData) => {
         }
     }
 }
+
+const defaultState = (): SimulatorData => ({
+    registerFile: [
+        { hasValue: true, value: 0 },
+        { hasValue: true, value: 0 },
+        { hasValue: true, value: 0 },
+        { hasValue: true, value: 0 }
+    ],
+    reservationStations: [
+        {
+            isEmpty: true,
+            isExecuting: false,
+            isReady: false,
+        },
+        {
+            isEmpty: true,
+            isExecuting: false,
+            isReady: false,
+        },
+        {
+            isEmpty: true,
+            isExecuting: false,
+            isReady: false,
+        },
+        {
+            isEmpty: true,
+            isExecuting: false,
+            isReady: false,
+        },
+        {
+            isEmpty: true,
+            isExecuting: false,
+            isReady: false,
+        },
+    ],
+    loadBuffers: [
+        {
+            isEmpty: true,
+            isReady: false,
+            isLoading: false,
+        },
+        {
+            isEmpty: true,
+            isReady: false,
+            isLoading: false,
+        },
+        {
+            isEmpty: true,
+            isReady: false,
+            isLoading: false,
+        },
+        {
+            isEmpty: true,
+            isReady: false,
+            isLoading: false,
+        },
+    ],
+    storeBuffers: [
+        {
+            isEmpty: true,
+            isReady: false,
+            isStoring: false,
+        },
+        {
+            isEmpty: true,
+            isReady: false,
+            isStoring: false,
+        },
+        {
+            isEmpty: true,
+            isReady: false,
+            isStoring: false,
+        },
+        {
+            isEmpty: true,
+            isReady: false,
+            isStoring: false,
+        },
+    ],
+    commonDataBus: {
+        isActive: false
+    },
+    addSubtractFunctionUnits: [
+        {
+            isEmpty: true,
+        },
+    ],
+    multiplyDivideFunctionUnits: [
+        {
+            isEmpty: true
+        },
+    ],
+    adderReservationStationCount: 3,
+    multiplierReservationStationCount: 2,
+    clockRate: 4,
+    instructionQueue: [],
+    transmitFlags: {
+        registerFileToReservationStations: false,
+        loadStoreBuffersToReservationStations: false,
+        reservationStationsToFunctionUnits: false,
+        instructionQueueToReservationStations: false,
+        functionUnitsToCommonDataBus: false,
+        commonDataBusToRegisterFile: false,
+        commonDataBusToLoadStoreUnits: false,
+        commonDataBusToReservationStations: false,
+        storeBuffersToMemoryUnit: false,
+        memoryUnitToLoadBuffers: false,
+    },
+    cyclesPerInstruction: {
+        addition: 2,
+        subtraction: 2,
+        multiplication: 10,
+        division: 40,
+        loading: 4,
+        storing: 4,
+    },
+})
