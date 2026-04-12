@@ -242,7 +242,9 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
                     firstArgument: station.firstArgument,
                     secondArgument: station.secondArgument,
                     sourceStationIndex: readyAddSubStation.index,
-                    ticksLeft: 2,
+                    ticksLeft: station.operation === 'add' ?
+                        currentState.cyclesPerInstruction.addition :
+                        currentState.cyclesPerInstruction.subtraction,
                     isEmpty: false
                 }
             ]
@@ -276,7 +278,9 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
                     firstArgument: station.firstArgument,
                     secondArgument: station.secondArgument,
                     sourceStationIndex: readyMulDivStation.index,
-                    ticksLeft: station.operation == 'mul' ? 10 : 40,
+                    ticksLeft: station.operation == 'mul' ?
+                        currentState.cyclesPerInstruction.multiplication :
+                        currentState.cyclesPerInstruction.division,
                     isEmpty: false
                 }
             ]

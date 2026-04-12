@@ -1,3 +1,4 @@
+import { failure, success, type Result } from '../util/Result.tsx'
 import { broadcastStep } from './Broadcast.tsx'
 import { dispatchStep } from './Dispatch.tsx'
 import { issueStep } from './Issue.tsx'
@@ -217,6 +218,17 @@ export const formatInstruction = (instruction: Instruction): string => {
     }
 }
 
+// Number of cycles each of the listed
+// instructions takes to complete
+export interface InstructionDurations {
+    addition: number,
+    subtraction: number,
+    multiplication: number,
+    division: number,
+    loading: number,
+    storing: number,
+}
+
 export interface SimulatorData {
     // Eventually, this will include a full copy
     // of the current state of the simulator
@@ -270,7 +282,17 @@ export interface SimulatorData {
         commonDataBusToRegisterFile: boolean,
         commonDataBusToLoadStoreUnits: boolean,
         commonDataBusToReservationStations: boolean,
+        storeBuffersToMemoryUnit: boolean,
+        memoryUnitToLoadBuffers: boolean,
     }
+
+    // Number of cycles taken to perform each
+    // type of instruction
+    cyclesPerInstruction: InstructionDurations
+
+    // A flag to indicate whether a simulation has begun
+    // since the last reset
+    running: boolean
 }
 
 export class Simulation {
@@ -313,99 +335,13 @@ export class Simulation {
     }
 
     private currentState: SimulatorData = { // TODO
+        ...defaultState(),
         registerFile: [
             { hasValue: true, value: 1.2 },
             { hasValue: true, value: 4.4 },
             { hasValue: true, value: 0 },
             { hasValue: true, value: 0 }
         ],
-        reservationStations: [
-            {
-                isEmpty: true,
-                isExecuting: false,
-                isReady: false,
-            },
-            {
-                isEmpty: true,
-                isExecuting: false,
-                isReady: false,
-            },
-            {
-                isEmpty: true,
-                isExecuting: false,
-                isReady: false,
-            },
-            {
-                isEmpty: true,
-                isExecuting: false,
-                isReady: false,
-            },
-            {
-                isEmpty: true,
-                isExecuting: false,
-                isReady: false,
-            },
-        ],
-        loadBuffers: [
-            {
-                isEmpty: true,
-                isReady: false,
-                isLoading: false,
-            },
-            {
-                isEmpty: true,
-                isReady: false,
-                isLoading: false,
-            },
-            {
-                isEmpty: true,
-                isReady: false,
-                isLoading: false,
-            },
-            {
-                isEmpty: true,
-                isReady: false,
-                isLoading: false,
-            },
-        ],
-        storeBuffers: [
-            {
-                isEmpty: true,
-                isReady: false,
-                isStoring: false,
-            },
-            {
-                isEmpty: true,
-                isReady: false,
-                isStoring: false,
-            },
-            {
-                isEmpty: true,
-                isReady: false,
-                isStoring: false,
-            },
-            {
-                isEmpty: true,
-                isReady: false,
-                isStoring: false,
-            },
-        ],
-        commonDataBus: {
-            isActive: false
-        },
-        addSubtractFunctionUnits: [
-            {
-                isEmpty: true,
-            },
-        ],
-        multiplyDivideFunctionUnits: [
-            {
-                isEmpty: true
-            },
-        ],
-        adderReservationStationCount: 3,
-        multiplierReservationStationCount: 2,
-        clockRate: 4,
         instructionQueue: [
             {
                 type: 'arithmetic',
@@ -436,17 +372,6 @@ export class Simulation {
                 destination: 3
             }
         ],
-        transmitFlags: {
-            registerFileToReservationStations: false,
-            loadStoreBuffersToReservationStations: false,
-            reservationStationsToFunctionUnits: false,
-            instructionQueueToReservationStations: false,
-            functionUnitsToCommonDataBus: false,
-            commonDataBusToRegisterFile: false,
-            commonDataBusToLoadStoreUnits: false,
-            commonDataBusToReservationStations: false,
-        }
-
     }
 
     public readonly getSimulatorData = (): SimulatorData => {
@@ -481,23 +406,31 @@ export class Simulation {
         this.publish()
     }
 
+    // Change how long each type of instruction takes to perform
+    // adjustment: A function that takes in the old durations as
+    // an argument and returns the desired durations
+    // returns: A Result containing the new durations on
+    // a success and an error code on a failure
+    public readonly adjustInstructionDurations = (
+        adjustment: (durations: InstructionDurations) => InstructionDurations
+    ): Result<InstructionDurations, 'NEGATIVE_DURATION' | 'ALREADY_RUNNING'> => {
+        if (this.currentState.running)
+            return failure('ALREADY_RUNNING')
+        const newDurations = adjustment(this.currentState.cyclesPerInstruction)
+        if (Object.entries(newDurations).find(e => e[1] < 0))
+            return failure('NEGATIVE_DURATION')
+        this.currentState = {
+            ...this.currentState,
+            cyclesPerInstruction: newDurations
+        }
+        this.publish()
+        return success(newDurations)
+    }
+
     private readonly tick = () => {
         this.currentState = [this.currentState]
-            .map(data => {
-                return {
-                    ...data,
-                    transmitFlags: {
-                        registerFileToReservationStations: false,
-                        loadStoreBuffersToReservationStations: false,
-                        reservationStationsToFunctionUnits: false,
-                        instructionQueueToReservationStations: false,
-                        functionUnitsToCommonDataBus: false,
-                        commonDataBusToRegisterFile: false,
-                        commonDataBusToLoadStoreUnits: false,
-                        commonDataBusToReservationStations: false,
-                    }
-                }
-            })
+            .map(setRunning)
+            .map(resetTransmitFlags)
             .map(issueStep)
             .map(dispatchStep)
             .map(broadcastStep)[0]
@@ -508,3 +441,146 @@ export class Simulation {
         this.publish()
     }
 }
+
+const setRunning = (data: SimulatorData): SimulatorData => (
+    data.running ? data : {
+        ...data,
+        running: true
+    }
+)
+
+const resetTransmitFlags = (data: SimulatorData): SimulatorData => {
+    return {
+        ...data,
+        transmitFlags: {
+            registerFileToReservationStations: false,
+            loadStoreBuffersToReservationStations: false,
+            reservationStationsToFunctionUnits: false,
+            instructionQueueToReservationStations: false,
+            functionUnitsToCommonDataBus: false,
+            commonDataBusToRegisterFile: false,
+            commonDataBusToLoadStoreUnits: false,
+            commonDataBusToReservationStations: false,
+            storeBuffersToMemoryUnit: false,
+            memoryUnitToLoadBuffers: false,
+        }
+    }
+}
+
+const defaultState = (): SimulatorData => ({
+    registerFile: [
+        { hasValue: true, value: 0 },
+        { hasValue: true, value: 0 },
+        { hasValue: true, value: 0 },
+        { hasValue: true, value: 0 }
+    ],
+    reservationStations: [
+        {
+            isEmpty: true,
+            isExecuting: false,
+            isReady: false,
+        },
+        {
+            isEmpty: true,
+            isExecuting: false,
+            isReady: false,
+        },
+        {
+            isEmpty: true,
+            isExecuting: false,
+            isReady: false,
+        },
+        {
+            isEmpty: true,
+            isExecuting: false,
+            isReady: false,
+        },
+        {
+            isEmpty: true,
+            isExecuting: false,
+            isReady: false,
+        },
+    ],
+    loadBuffers: [
+        {
+            isEmpty: true,
+            isReady: false,
+            isLoading: false,
+        },
+        {
+            isEmpty: true,
+            isReady: false,
+            isLoading: false,
+        },
+        {
+            isEmpty: true,
+            isReady: false,
+            isLoading: false,
+        },
+        {
+            isEmpty: true,
+            isReady: false,
+            isLoading: false,
+        },
+    ],
+    storeBuffers: [
+        {
+            isEmpty: true,
+            isReady: false,
+            isStoring: false,
+        },
+        {
+            isEmpty: true,
+            isReady: false,
+            isStoring: false,
+        },
+        {
+            isEmpty: true,
+            isReady: false,
+            isStoring: false,
+        },
+        {
+            isEmpty: true,
+            isReady: false,
+            isStoring: false,
+        },
+    ],
+    commonDataBus: {
+        isActive: false
+    },
+    addSubtractFunctionUnits: [
+        {
+            isEmpty: true,
+        },
+    ],
+    multiplyDivideFunctionUnits: [
+        {
+            isEmpty: true
+        },
+    ],
+    adderReservationStationCount: 3,
+    multiplierReservationStationCount: 2,
+    clockRate: 4,
+    instructionQueue: [],
+    transmitFlags: {
+        registerFileToReservationStations: false,
+        loadStoreBuffersToReservationStations: false,
+        reservationStationsToFunctionUnits: false,
+        instructionQueueToReservationStations: false,
+        functionUnitsToCommonDataBus: false,
+        commonDataBusToRegisterFile: false,
+        commonDataBusToLoadStoreUnits: false,
+        commonDataBusToReservationStations: false,
+        storeBuffersToMemoryUnit: false,
+        memoryUnitToLoadBuffers: false,
+    },
+    cyclesPerInstruction: {
+        addition: 2,
+        subtraction: 2,
+        multiplication: 10,
+        division: 40,
+        loading: 4,
+        storing: 4,
+    },
+    running: false,
+})

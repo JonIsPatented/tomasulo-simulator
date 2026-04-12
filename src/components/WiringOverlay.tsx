@@ -14,6 +14,7 @@ interface WiringOverlayProps {
     loadStoreBuffers?: Position
     instructionQueue?: Position
     commonDataBus?: Position
+    memoryUnit?: Position
 }
 
 export const WiringOverlay = ({
@@ -23,6 +24,7 @@ export const WiringOverlay = ({
     loadStoreBuffers,
     instructionQueue,
     commonDataBus,
+    memoryUnit,
 }: WiringOverlayProps) => {
 
     const right = (pos: Position) => ({
@@ -51,6 +53,7 @@ export const WiringOverlay = ({
     if (!loadStoreBuffers) return <></>
     if (!instructionQueue) return <></>
     if (!commonDataBus) return <></>
+    if (!memoryUnit) return <></>
 
     const transmitFlags = useSimulation(data => data.transmitFlags)
 
@@ -155,6 +158,32 @@ export const WiringOverlay = ({
                 }}
                 orthogonalDirection="vertical"
                 active={transmitFlags.commonDataBusToReservationStations}
+            />
+
+            <Wire
+                from={{
+                    ...top(loadStoreBuffers),
+                    x: (right(loadStoreBuffers).x + top(loadStoreBuffers).x) / 2
+                }}
+                to={{
+                    ...bottom(memoryUnit),
+                    x: (right(loadStoreBuffers).x + top(loadStoreBuffers).x) / 2
+                }}
+                orthogonalDirection="vertical"
+                active={transmitFlags.storeBuffersToMemoryUnit}
+            />
+
+            <Wire
+                from={{
+                    ...bottom(memoryUnit),
+                    x: (left(loadStoreBuffers).x + top(loadStoreBuffers).x) / 2
+                }}
+                to={{
+                    ...top(loadStoreBuffers),
+                    x: (left(loadStoreBuffers).x + top(loadStoreBuffers).x) / 2
+                }}
+                orthogonalDirection="vertical"
+                active={transmitFlags.memoryUnitToLoadBuffers}
             />
         </svg>
     )
