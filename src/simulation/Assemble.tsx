@@ -7,7 +7,13 @@ import type {
 
 export type AssembleError =
   | { code: "EMPTY_PROGRAM" }
-  | { code: "INVALID_INSTRUCTION"; line: number; text: string };
+  | { code: "INVALID_INSTRUCTION"; line: number; text: string }
+  | {
+      code: "INVALID_REGISTER";
+      line: number;
+      register: number;
+      registerFileSize: number;
+    };
 
 type ParseRule = [RegExp, (match: RegExpMatchArray) => Instruction];
 
@@ -145,8 +151,16 @@ const parseInstruction = (line: string): Instruction | null => {
   return null;
 };
 
+const isValidRegister = (
+  registerIndex: number,
+  registerFileSize: number,
+): boolean => {
+  return registerIndex >= 0 && registerIndex < registerFileSize;
+};
+
 export const assembleProgram = (
   program: string,
+  registerFileSize: number,
 ): Result<Instruction[], AssembleError> => {
   const scrubbedLines = scrubProgram(program);
 
@@ -172,6 +186,27 @@ export const assembleProgram = (
           code: "INVALID_INSTRUCTION",
           line: index + 1,
           text: line,
+        },
+      };
+    }
+
+    const registersToValidate =
+      instruction.type === "arithmetic"
+        ? [instruction.destination, instruction.source1, instruction.source2]
+        : [instruction.register, instruction.baseRegister];
+
+    const invalidRegister = registersToValidate.find(
+      (register) => !isValidRegister(register, registerFileSize),
+    );
+
+    if (invalidRegister !== undefined) {
+      return {
+        ok: false,
+        error: {
+          code: "INVALID_REGISTER",
+          line: index + 1,
+          register: invalidRegister,
+          registerFileSize: registerFileSize,
         },
       };
     }
