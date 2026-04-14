@@ -5,7 +5,7 @@ interface NumberInputProps {
   maxValue: number
   value: number
   onChange: (value: number) => void
-  disabled: boolean
+  disabled?: boolean
 }
 
 export const NumberInput = ({
@@ -13,7 +13,7 @@ export const NumberInput = ({
   maxValue,
   value,
   onChange,
-  disabled,
+  disabled = false,
 }: NumberInputProps) => {
   const [isEmpty, setIsEmpty] = useState(false)
 
