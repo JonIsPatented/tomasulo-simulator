@@ -1,7 +1,65 @@
 import { Dialog, Button, Text, Grid, Slider } from '@radix-ui/themes'
-import { Simulation } from '../simulation/Simulation'
+import {
+  Simulation,
+  type InstructionDurations,
+} from '../simulation/Simulation'
 import { useSimulation } from '../hooks/useSimulation'
 import { NumberInput } from './NumberInput'
+
+interface DurationControlSliderProps {
+  label: string
+  toAdjustDurations: (
+    durations: InstructionDurations,
+    value: number
+  ) => void
+  durationNarrower: (durations: InstructionDurations) => number
+}
+
+const DurationControlSlider = ({
+  label,
+  toAdjustDurations,
+  durationNarrower,
+}: DurationControlSliderProps) => {
+  const duration = useSimulation((data) =>
+    durationNarrower(data.cyclesPerInstruction)
+  )
+  const isRunning = useSimulation((data) => data.running)
+
+  return (
+    <>
+      <Text>{label}</Text>
+      <Slider
+        variant='classic'
+        min={1}
+        max={60}
+        onValueChange={(e) => {
+          Simulation.getSimulation().adjustInstructionDurations(
+            (durations) => {
+              toAdjustDurations(durations, e[0])
+              return { ...durations }
+            }
+          )
+        }}
+        value={[duration]}
+        disabled={isRunning}
+      />
+      <NumberInput
+        minValue={1}
+        maxValue={60}
+        value={duration}
+        onChange={(val) => {
+          Simulation.getSimulation().adjustInstructionDurations(
+            (durations) => {
+              toAdjustDurations(durations, val)
+              return { ...durations }
+            }
+          )
+        }}
+        disabled={isRunning}
+      />
+    </>
+  )
+}
 
 export const SettingsMenu = () => {
   return (
@@ -14,262 +72,53 @@ export const SettingsMenu = () => {
         <Dialog.Description className='DialogDescription'>
           Change how many clock cycles each instruction takes.
         </Dialog.Description>
+
         <Grid
-          columns='12'
+          columns='auto 1fr auto'
           align='center'
+          gapX='4'
         >
-          <Text className='col-span-3'>Addition:</Text>
-          <div className='col-span-8'>
-            <Slider
-              variant='classic'
-              min={1}
-              max={60}
-              onValueChange={(e) => {
-                Simulation.getSimulation().adjustInstructionDurations(
-                  (durations) => {
-                    durations.addition = e[0]
-                    return durations
-                  }
-                )
-              }}
-              value={[
-                useSimulation(
-                  (data) => data.cyclesPerInstruction.addition
-                ),
-              ]}
-              disabled={useSimulation((data) => data.running)}
-            />
-          </div>
-          <NumberInput
-            minValue={1}
-            maxValue={60}
-            value={useSimulation(
-              (data) => data.cyclesPerInstruction.addition
-            )}
-            onChange={(val) => {
-              Simulation.getSimulation().adjustInstructionDurations(
-                (durations) => {
-                  durations.addition = val
-                  return { ...durations }
-                }
-              )
+          <DurationControlSlider
+            label='Addition:'
+            toAdjustDurations={(durations, value) => {
+              durations.addition = value
             }}
-            disabled={useSimulation((data) => data.running)}
+            durationNarrower={(durations) => durations.addition}
           />
-        </Grid>
-        <Grid
-          columns='12'
-          align='center'
-        >
-          <Text className='col-span-3'>Subtraction:</Text>
-          <div className='col-span-8'>
-            <Slider
-              variant='classic'
-              min={1}
-              max={60}
-              onValueChange={(e) => {
-                Simulation.getSimulation().adjustInstructionDurations(
-                  (durations) => {
-                    durations.subtraction = e[0]
-                    return durations
-                  }
-                )
-              }}
-              value={[
-                useSimulation(
-                  (data) => data.cyclesPerInstruction.subtraction
-                ),
-              ]}
-              disabled={useSimulation((data) => data.running)}
-            />
-          </div>
-          <NumberInput
-            minValue={1}
-            maxValue={60}
-            value={useSimulation(
-              (data) => data.cyclesPerInstruction.subtraction
-            )}
-            onChange={(val) => {
-              Simulation.getSimulation().adjustInstructionDurations(
-                (durations) => {
-                  durations.subtraction = val
-                  return { ...durations }
-                }
-              )
+          <DurationControlSlider
+            label='Subtraction:'
+            toAdjustDurations={(durations, value) => {
+              durations.subtraction = value
             }}
-            disabled={useSimulation((data) => data.running)}
+            durationNarrower={(durations) => durations.subtraction}
           />
-        </Grid>
-        <Grid
-          columns='12'
-          align='center'
-        >
-          <Text className='col-span-3'>Multiplication:</Text>
-          <div className='col-span-8'>
-            <Slider
-              variant='classic'
-              min={1}
-              max={60}
-              onValueChange={(e) => {
-                Simulation.getSimulation().adjustInstructionDurations(
-                  (durations) => {
-                    durations.multiplication = e[0]
-                    return durations
-                  }
-                )
-              }}
-              value={[
-                useSimulation(
-                  (data) => data.cyclesPerInstruction.multiplication
-                ),
-              ]}
-              disabled={useSimulation((data) => data.running)}
-            />
-          </div>
-          <NumberInput
-            minValue={1}
-            maxValue={60}
-            value={useSimulation(
-              (data) => data.cyclesPerInstruction.multiplication
-            )}
-            onChange={(val) => {
-              Simulation.getSimulation().adjustInstructionDurations(
-                (durations) => {
-                  durations.multiplication = val
-                  return { ...durations }
-                }
-              )
+          <DurationControlSlider
+            label='Multiplication:'
+            toAdjustDurations={(durations, value) => {
+              durations.multiplication = value
             }}
-            disabled={useSimulation((data) => data.running)}
+            durationNarrower={(durations) => durations.multiplication}
           />
-        </Grid>
-        <Grid
-          columns='12'
-          align='center'
-        >
-          <Text className='col-span-3'>Division:</Text>
-          <div className='col-span-8'>
-            <Slider
-              variant='classic'
-              min={1}
-              max={60}
-              onValueChange={(e) => {
-                Simulation.getSimulation().adjustInstructionDurations(
-                  (durations) => {
-                    durations.division = e[0]
-                    return durations
-                  }
-                )
-              }}
-              value={[
-                useSimulation(
-                  (data) => data.cyclesPerInstruction.division
-                ),
-              ]}
-              disabled={useSimulation((data) => data.running)}
-            />
-          </div>
-          <NumberInput
-            minValue={1}
-            maxValue={60}
-            value={useSimulation(
-              (data) => data.cyclesPerInstruction.division
-            )}
-            onChange={(val) => {
-              Simulation.getSimulation().adjustInstructionDurations(
-                (durations) => {
-                  durations.division = val
-                  return { ...durations }
-                }
-              )
+          <DurationControlSlider
+            label='Division:'
+            toAdjustDurations={(durations, value) => {
+              durations.division = value
             }}
-            disabled={useSimulation((data) => data.running)}
+            durationNarrower={(durations) => durations.division}
           />
-        </Grid>
-        <Grid
-          columns='12'
-          align='center'
-        >
-          <Text className='col-span-3'>Loading:</Text>
-          <div className='col-span-8'>
-            <Slider
-              variant='classic'
-              min={1}
-              max={60}
-              onValueChange={(e) => {
-                Simulation.getSimulation().adjustInstructionDurations(
-                  (durations) => {
-                    durations.loading = e[0]
-                    return durations
-                  }
-                )
-              }}
-              value={[
-                useSimulation(
-                  (data) => data.cyclesPerInstruction.loading
-                ),
-              ]}
-              disabled={useSimulation((data) => data.running)}
-            />
-          </div>
-          <NumberInput
-            minValue={1}
-            maxValue={60}
-            value={useSimulation(
-              (data) => data.cyclesPerInstruction.loading
-            )}
-            onChange={(val) => {
-              Simulation.getSimulation().adjustInstructionDurations(
-                (durations) => {
-                  durations.loading = val
-                  return { ...durations }
-                }
-              )
+          <DurationControlSlider
+            label='Loading:'
+            toAdjustDurations={(durations, value) => {
+              durations.loading = value
             }}
-            disabled={useSimulation((data) => data.running)}
+            durationNarrower={(durations) => durations.loading}
           />
-        </Grid>
-        <Grid
-          columns='12'
-          align='center'
-        >
-          <Text className='col-span-3'>Storing:</Text>
-          <div className='col-span-8'>
-            <Slider
-              variant='classic'
-              min={1}
-              max={60}
-              onValueChange={(e) => {
-                Simulation.getSimulation().adjustInstructionDurations(
-                  (durations) => {
-                    durations.storing = e[0]
-                    return { ...durations }
-                  }
-                )
-              }}
-              value={[
-                useSimulation(
-                  (data) => data.cyclesPerInstruction.storing
-                ),
-              ]}
-              disabled={useSimulation((data) => data.running)}
-            />
-          </div>
-          <NumberInput
-            minValue={1}
-            maxValue={60}
-            value={useSimulation(
-              (data) => data.cyclesPerInstruction.storing
-            )}
-            onChange={(val) => {
-              Simulation.getSimulation().adjustInstructionDurations(
-                (durations) => {
-                  durations.storing = val
-                  return { ...durations }
-                }
-              )
+          <DurationControlSlider
+            label='Storing:'
+            toAdjustDurations={(durations, value) => {
+              durations.storing = value
             }}
-            disabled={useSimulation((data) => data.running)}
+            durationNarrower={(durations) => durations.division}
           />
         </Grid>
       </Dialog.Content>
