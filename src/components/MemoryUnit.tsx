@@ -41,7 +41,10 @@ export const MemoryUnit = () => {
             weight='medium'
             className='border-b border-gray-100 py-1 whitespace-nowrap'
           >
-            {address}
+            {`0x${address
+              .toString(16)
+              .padStart(8, '0')
+              .toUpperCase()}`}
           </Text>
           <TextField.Root
             key={`memory-value-${i}`}
