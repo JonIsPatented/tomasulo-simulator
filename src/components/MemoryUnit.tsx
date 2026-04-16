@@ -7,7 +7,7 @@ export const MemoryUnit = () => {
   const memoryUnit = useSimulation((data) => data.memoryUnit)
   const [startIndex] = useState(0)
   const currentlyVisibleAddresses = Array.from(
-    { length: 10 },
+    { length: 5 },
     (_, i) => i + startIndex
   )
   return (
