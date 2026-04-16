@@ -83,14 +83,14 @@ export const MemoryUnit = () => {
                 onClick={() => {
                   let addressText =
                     currentAddressFieldText.toLowerCase()
-                  if (addressText.match(/[^\dabcdef]/)) {
+                  if (addressText.match(/[^\dabcdefx]/)) {
                     setCurrentAddressFieldText('')
                     return
                   }
                   if (!addressText.startsWith('0x')) {
                     addressText = '0x' + addressText
                   }
-                  const address = parseInt(addressText, 16)
+                  const address = parseInt(addressText)
 
                   const maxAddress =
                     parseInt('0xFFFFFFFF') - visibleAddressCount
