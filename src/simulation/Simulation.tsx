@@ -1,4 +1,5 @@
 import { failure, success, type Result } from '../util/Result.tsx'
+import { assembleProgram, type AssembleError } from "./Assemble.tsx";
 import { broadcastStep } from './Broadcast.tsx'
 import { dispatchStep } from './Dispatch.tsx'
 import { issueStep } from './Issue.tsx'
@@ -439,6 +440,38 @@ export class Simulation {
     public readonly step = () => {
         this.tick()
         this.publish()
+    }
+
+    // Assembles a raw program stirng and loads it into the simulator
+    // Resets the state of the simulator while preserving user settings
+    // Returns a result indicating if the program failed to assemble
+    public readonly loadProgram = (
+        program: string
+    ): Result<
+        {
+            message: 'PROGRAM_LOADED'
+        },
+        AssembleError
+    > => {
+        this.stopClock()
+        
+
+        const result = assembleProgram(program, this.currentState.registerFile.length)
+
+        if (!result.ok) return failure(result.error)
+
+        this.currentState = {
+            ...defaultState(),
+            instructionQueue: result.value,
+            clockRate: this.currentState.clockRate,
+            cyclesPerInstruction: this.currentState.cyclesPerInstruction,
+        }
+
+        this.publish()
+
+        return success({
+            message: "PROGRAM_LOADED" as const
+        })
     }
 }
 

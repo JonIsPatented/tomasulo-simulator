@@ -1,10 +1,38 @@
-import { Button, Dialog, Flex, Grid, Heading, Slider, Text } from "@radix-ui/themes"
+import { Button, Dialog, Flex, Grid, Heading, Slider, Text } from '@radix-ui/themes'
 import { useSimulation } from '../hooks/useSimulation'
 import { Simulation, type Instruction } from '../simulation/Simulation'
-import { useState } from "react"
+import { SettingsMenu } from './SettingsMenu'
+import { NumberInput } from './NumberInput'import { useState } from "react"
 import {assembleProgram} from "../simulation/Assemble"
 
 export const TitleBar = () => {
+  const clockRate = useSimulation((data) => data.clockRate)
+
+  return (
+    <Grid columns='3'>
+      <Flex
+        justify='start'
+        align='center'
+      >
+        <SettingsMenu />
+      </Flex>
+      <Flex
+        align='center'
+        justify='center'
+      >
+        <Heading size='4'>Tomasulo Simulator</Heading>
+      </Flex>
+      <Flex
+        gap='2'
+        align='center'
+        justify='end'
+      >
+        <Button
+          onClick={Simulation.getSimulation().step}
+          variant='outline'
+        >
+          Step
+        </Button>
     const [code,setcode]= useState("");
     const clockRate = useSimulation((data) => data.clockRate)
     const simulation = Simulation.getSimulation()
@@ -65,36 +93,28 @@ export const TitleBar = () => {
                     Step
                 </Button>
 
-                <Button onClick={simulation.startClock} variant="outline">
-                    Start
-                </Button>
+        <Button
+          onClick={Simulation.getSimulation().startClock}
+          variant='outline'
+        >
+          Start
+        </Button>
 
-                <Button onClick={simulation.stopClock} variant="outline">
-                    Stop
-                </Button>
+        <Button
+          onClick={Simulation.getSimulation().stopClock}
+          variant='outline'
+        >
+          Stop
+        </Button>
 
-                <input
-                    type="number"
-                    id="quantity"
-                    name="quantity"
-                    min="1"
-                    max="10"
-                    defaultValue={clockRate}
-                    onChange={(e) => {
-                        //I love having to manually sanitize
-                        if (e.currentTarget.value == "") {
-                            e.currentTarget.value = "1"
-                        }
-                        const clamped: number = Math.min(Math.max(parseInt(e.currentTarget.value), 1), 10)
-                        e.currentTarget.value = clamped.toString()
-                        simulation.setClockRate(clamped)
-                    }}
-                />
-                <Text size="2">
-                    ticks/sec
-                </Text>
-            </Flex>
-        </Grid>
-        
-    )
+        <NumberInput
+          minValue={1}
+          maxValue={10}
+          value={clockRate}
+          onChange={Simulation.getSimulation().setClockRate}
+        />
+        <Text size='2'>ticks/sec</Text>
+      </Flex>
+    </Grid>
+  )
 }
