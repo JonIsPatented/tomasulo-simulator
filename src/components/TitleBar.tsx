@@ -22,7 +22,7 @@ export const TitleBar = () => {
         }
       
        }else{
-        console.log(ParsedInstructions.error)
+        console.log(ParsedInstructions.error);
        }
 }
     return (

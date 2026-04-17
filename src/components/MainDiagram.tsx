@@ -8,7 +8,6 @@ import { Buffers } from './Buffers'
 import { Flex } from '@radix-ui/themes'
 import { InstructionQueue } from './InstructionQueue'
 import { MemoryUnit } from './MemoryUnit'
-import { InstructionHistory } from './InstructionHistory'
 import { type Position, WiringOverlay } from './WiringOverlay'
 
 import { useLayoutEffect, useRef, useState } from 'react'
@@ -116,7 +115,7 @@ export const MainDiagram = () => {
                 {/* Instruction History */}
                 <div className='col-span-4'>
                     <Section title='Instruction History'>
-                        <InstructionHistory />
+                
                     </Section>
                 </div>
 
