@@ -1,6 +1,6 @@
 import { Grid } from '@radix-ui/themes/dist/cjs/index.js'
 import { useSimulation } from '../hooks/useSimulation'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { IconButton, Text, TextField } from '@radix-ui/themes'
 import {
   EnterIcon,
@@ -18,6 +18,31 @@ export const MemoryUnit = () => {
   )
   const [currentAddressFieldText, setCurrentAddressFieldText] =
     useState('')
+
+  const handleAddressJump = useCallback(() => {
+    let addressText = currentAddressFieldText.toLowerCase()
+    if (addressText.startsWith('0x')) {
+      addressText = addressText.substring(2)
+    }
+    if (addressText.match(/[^\dabcdef]/)) {
+      setCurrentAddressFieldText('')
+      return
+    }
+    addressText = '0x' + addressText
+
+    const address = parseInt(addressText)
+
+    const maxAddress = parseInt('0xFFFFFFFF') - visibleAddressCount
+
+    const adjustedAddress = Math.max(Math.min(address, maxAddress), 0)
+
+    setStartIndex(adjustedAddress)
+    setCurrentAddressFieldText('')
+  }, [
+    currentAddressFieldText,
+    setCurrentAddressFieldText,
+    setStartIndex,
+  ])
   return (
     <Grid
       columns='2'
@@ -76,34 +101,13 @@ export const MemoryUnit = () => {
           onChange={(e) =>
             setCurrentAddressFieldText(e.currentTarget.value.trim())
           }
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') handleAddressJump()
+          }}
         >
           <TextField.Slot>
             <IconButton variant='ghost'>
-              <EnterIcon
-                onClick={() => {
-                  let addressText =
-                    currentAddressFieldText.toLowerCase()
-                  if (addressText.match(/[^\dabcdefx]/)) {
-                    setCurrentAddressFieldText('')
-                    return
-                  }
-                  if (!addressText.startsWith('0x')) {
-                    addressText = '0x' + addressText
-                  }
-                  const address = parseInt(addressText)
-
-                  const maxAddress =
-                    parseInt('0xFFFFFFFF') - visibleAddressCount
-
-                  const adjustedAddress = Math.max(
-                    Math.min(address, maxAddress),
-                    0
-                  )
-
-                  setStartIndex(adjustedAddress)
-                  setCurrentAddressFieldText('')
-                }}
-              />
+              <EnterIcon onClick={handleAddressJump} />
             </IconButton>
           </TextField.Slot>
         </TextField.Root>
