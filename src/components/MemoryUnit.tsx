@@ -32,7 +32,8 @@ export const MemoryUnit = () => {
 
     const address = parseInt(addressText)
 
-    const maxAddress = parseInt('0xFFFFFFFF') - visibleAddressCount
+    const maxAddress =
+      parseInt('0xFFFFFFFF') - visibleAddressCount + 1
 
     const adjustedAddress = Math.max(Math.min(address, maxAddress), 0)
 
@@ -115,7 +116,10 @@ export const MemoryUnit = () => {
           variant='ghost'
           onClick={() =>
             setStartIndex((val) =>
-              Math.min(val + 1, parseInt('FFFFFFFF', 16))
+              Math.min(
+                val + 1,
+                parseInt('FFFFFFFF', 16) - visibleAddressCount + 1
+              )
             )
           }
         >
