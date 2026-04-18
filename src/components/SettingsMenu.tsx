@@ -5,6 +5,7 @@ import {
 } from '../simulation/Simulation'
 import { useSimulation } from '../hooks/useSimulation'
 import { NumberInput } from './NumberInput'
+import { useState } from 'react'
 
 interface DurationControlSliderProps {
   label: string
@@ -24,7 +25,7 @@ const DurationControlSlider = ({
     durationNarrower(data.cyclesPerInstruction)
   )
   const isRunning = useSimulation((data) => data.running)
-
+  
   return (
     <>
       <Text>{label}</Text>
@@ -62,6 +63,12 @@ const DurationControlSlider = ({
 }
 
 export const SettingsMenu = () => {
+  const [code,setcode]= useState("");
+  function assemble(){
+        const codeString:string = code;
+        console.log("running")
+        Simulation.getSimulation().loadProgram(codeString);
+}
   return (
     <Dialog.Root>
       <Dialog.Trigger>
@@ -121,6 +128,13 @@ export const SettingsMenu = () => {
             durationNarrower={(durations) => durations.division}
           />
         </Grid>
+        <div className="flex flex-col gap-2">
+          <Button onClick={() => assemble()}>import code</Button>
+          <label>Import Code:</label>
+          <textarea className="w-full h-40 border rounded p-2" 
+          placeholder="Paste your code here..." 
+          value={code} onChange={(input)=>setcode(input.target.value)}/>
+        </div> 
       </Dialog.Content>
     </Dialog.Root>
   )
