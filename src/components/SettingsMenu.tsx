@@ -6,7 +6,6 @@ import {
   Slider,
   TextArea,
   Flex,
-  Card,
   Callout,
 } from '@radix-ui/themes'
 import {
