@@ -192,7 +192,7 @@ export const SettingsMenu = () => {
                       case 'INVALID_INSTRUCTION':
                         return `Invalid instruction at line ${error.line}: ${error.text}`
                       case 'INVALID_REGISTER':
-                        return `Invalid register index on line ${error.line}: ${error.register} is greater than the maximum ${error.registerFileSize}`
+                        return `Invalid register index on line ${error.line}: ${error.register} is greater than the maximum ${error.registerFileSize}.`
                     }
                   })()}
                 </Callout.Text>
