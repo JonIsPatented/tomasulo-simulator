@@ -78,6 +78,7 @@ export const SettingsMenu = () => {
   const [open, setOpen] = useState(false)
   const [code, setCode] = useState('')
   const [error, setError] = useState<AssembleError | null>(null)
+  const hasStarted = useSimulation((data) => data.running)
 
   return (
     <Dialog.Root
@@ -167,12 +168,13 @@ export const SettingsMenu = () => {
                 }
                 setError(result.error)
               }}
+              disabled={hasStarted}
             >
               Import Code
             </Button>
             <TextArea
               radius='large'
-              className='h-40 w-full rounded border p-2'
+              className='h-40 w-full'
               placeholder='Paste your code here...'
               value={code}
               onChange={(e) => setCode(e.target.value)}
