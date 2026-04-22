@@ -1,4 +1,4 @@
-import type { FunctionUnitData, ReadyStation, ReservationStationData, SimulatorData } from "./Simulation";
+import type { FunctionUnitData, ReadyStation, ReservationStationData, SimulatorData, SourceReference, LoadBufferData, StoreBufferData} from "./Simulation";
 
 export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (currentState: SimulatorData) => {
 
@@ -7,8 +7,93 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
     let resStations = currentState.reservationStations
     let regFile = currentState.registerFile
     let transmitFlags = currentState.transmitFlags
+    let loadBuffers = currentState.loadBuffers;
+    let storeBuffers = currentState.storeBuffers;
+
 
     if (bus.isActive) {
+
+        const matchesBusSource = (source: SourceReference): boolean => {
+            return bus.source === "operation"
+            ?   source.source === "reservationStation" &&
+                source.index === bus.sourceStation
+            :   source.source === "loadBuffer" &&
+                source.index === bus.sourceLoadBufferIndex;
+        };
+
+        loadBuffers = loadBuffers.map((buffer): LoadBufferData  => {
+            if (buffer.isEmpty || buffer.isReady) return buffer
+            if (!matchesBusSource(buffer.waitingFor)) return buffer
+
+            return {
+                isEmpty: false,
+                isReady: true,
+                isLoading: false,
+                address: bus.value + buffer.offset,
+                ticksLeft: 0,
+            }
+        })
+
+        storeBuffers = storeBuffers.map((buffer): StoreBufferData<number> => {
+            if (buffer.isEmpty || buffer.isReady) return buffer
+
+            if (buffer.waitingFor === "address") {
+                if (!matchesBusSource(buffer.addressSource)) return buffer
+
+                return {
+                    isEmpty: false,
+                    isReady: true,
+                    isStoring: false,
+                    address: bus.value + buffer.offset,
+                    value: buffer.value,
+                    ticksLeft: 0,
+                }
+            }
+
+            if(buffer.waitingFor === "value"){
+                if(!matchesBusSource(buffer.valueSource)) return buffer
+
+                return{
+                    isEmpty: false,
+                    isReady: true,
+                    isStoring: false,
+                    address: buffer.address,
+                    value: bus.value,
+                    ticksLeft: 0,
+                }
+            }
+
+            if (buffer.waitingFor === "both") {
+                const addressReady = matchesBusSource(buffer.addressSource);
+                const valueReady = matchesBusSource(buffer.valueSource);
+
+                if (!addressReady && !valueReady) return buffer
+
+                if (addressReady) {
+                    return{
+                        isEmpty: false,
+                        isReady: false,
+                        isStoring: false,
+                        waitingFor: "value",
+                        valueSource: buffer.valueSource,
+                        address: bus.value + buffer.offset,
+                    }
+                }
+
+                return{
+                    isEmpty: false,
+                    isReady: false,
+                    isStoring: false,
+                    waitingFor: "address",
+                    addressSource: buffer.addressSource,
+                    offset: buffer.offset,
+                    value: bus.value,
+                }
+            }
+            return buffer
+        })
+
+
         if (bus.source === 'operation') {
             transmitFlags = {
                 ...transmitFlags,
@@ -93,7 +178,9 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
                 }
             })
             regFile = regFile.map((register) => {
-                if (!register.hasValue && register.alias === bus.sourceStation) {
+                if (!register.hasValue && 
+                    register.alias.source === "reservationStation" &&
+                    register.alias.index === bus.sourceStation) {
                     return {
                         hasValue: true,
                         value: bus.value,
@@ -109,29 +196,31 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
                 commonDataBusToReservationStations: true,
             }
             resStations = resStations.map((station) => {
-                const firstFromRegister =
+                const firstFromLoad  =
                     !station.isEmpty &&
                     !station.isReady &&
                     !station.firstArgument.isReady &&
                     station.firstArgument.waitingFor === 'load' &&
-                    station.firstArgument.registerIndex === bus.destinationRegister
+                    station.firstArgument.source.source === "loadBuffer" &&
+                    station.firstArgument.source.index === bus.sourceLoadBufferIndex
 
-                const secondFromRegister =
+                const secondFromLoad =
                     !station.isEmpty &&
                     !station.isReady &&
                     !station.secondArgument.isReady &&
                     station.secondArgument.waitingFor === 'load' &&
-                    station.secondArgument.registerIndex === bus.destinationRegister
+                    station.secondArgument.source.source === "loadBuffer" &&
+                    station.secondArgument.source.index === bus.sourceLoadBufferIndex
 
-                if (firstFromRegister || secondFromRegister)
+                if (firstFromLoad  || secondFromLoad)
                     transmitFlags = {
                         ...transmitFlags,
                         commonDataBusToReservationStations: true,
                     }
 
-                return !firstFromRegister && !secondFromRegister ? {
+                return !firstFromLoad  && !secondFromLoad ? {
                     ...station,
-                } : firstFromRegister && station.secondArgument.isReady ? {
+                } : firstFromLoad  && station.secondArgument.isReady ? {
                     isReady: true,
                     isEmpty: false,
                     isExecuting: false,
@@ -145,14 +234,14 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
                     operation: station.operation,
                     firstArgument: station.firstArgument.value,
                     secondArgument: bus.value,
-                } : firstFromRegister && secondFromRegister ? {
+                } : firstFromLoad  && secondFromLoad ? {
                     isReady: true,
                     isEmpty: false,
                     isExecuting: false,
                     operation: station.operation,
                     firstArgument: bus.value,
                     secondArgument: bus.value,
-                } : firstFromRegister ? {
+                } : firstFromLoad  ? {
                     isReady: false,
                     isEmpty: false,
                     isExecuting: false,
@@ -179,7 +268,7 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
                 }
             })
             regFile = regFile.map((register, i) => {
-                if (bus.source === 'load' && i === bus.destinationRegister) {
+                if (bus.source === 'load' && !register.hasValue && register.alias.source === "loadBuffer" && register.alias.index === bus.sourceLoadBufferIndex) {
                     return {
                         hasValue: true,
                         value: bus.value,
@@ -212,6 +301,78 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
         }
     }
 
+    const decLoadBuffer = (buffer: LoadBufferData): LoadBufferData => {
+        if (buffer.isEmpty || !buffer.isReady) return buffer;
+        if (!buffer.isLoading || buffer.ticksLeft === 0) return buffer;
+
+        return {
+            ...buffer,
+            ticksLeft: buffer.ticksLeft - 1,
+        }
+    }
+
+    const decStoreBuffer = (buffer: StoreBufferData<number>): StoreBufferData<number> => {
+        if (buffer.isEmpty || !buffer.isReady) return buffer;
+        if (!buffer.isStoring || buffer.ticksLeft === 0) return buffer;
+
+        return {
+            ...buffer,
+            ticksLeft: buffer.ticksLeft - 1,
+        }
+    }
+
+    loadBuffers = loadBuffers.map(decLoadBuffer);
+    storeBuffers = storeBuffers.map(decStoreBuffer);
+
+    //let loadStoreTransmit = false
+
+    const readyLoadIndex = loadBuffers.findIndex((buffer) =>
+        !buffer.isEmpty &&
+        buffer.isReady &&
+        !buffer.isLoading &&
+        buffer.ticksLeft === 0
+    )
+
+    const readyLoad = readyLoadIndex === -1 ? null : loadBuffers[readyLoadIndex]
+
+    if (readyLoadIndex !== -1 && readyLoad && !readyLoad.isEmpty && readyLoad.isReady) {
+        loadBuffers = loadBuffers.map((buffer, i): LoadBufferData => {
+            if (i !== readyLoadIndex) return buffer
+
+            return{
+                isEmpty: false,
+                isReady: true,
+                isLoading: true,
+                address: readyLoad.address,
+                ticksLeft: currentState.cyclesPerInstruction.loading,
+            }
+        })
+    }
+
+    const readyStoreIndex = storeBuffers.findIndex((buffer) =>
+        !buffer.isEmpty &&
+        buffer.isReady &&
+        !buffer.isStoring &&
+        buffer.ticksLeft === 0
+    )
+
+    const readyStore = readyStoreIndex === -1 ? null : storeBuffers[readyStoreIndex]
+
+    if (readyStoreIndex !== -1 && readyStore && !readyStore.isEmpty && readyStore.isReady) {
+        storeBuffers = storeBuffers.map((buffer, i): StoreBufferData<number> => {
+            if (i !== readyStoreIndex) return buffer
+
+            return{
+                isEmpty: false,
+                isReady: true,
+                isStoring: true,
+                address: readyStore.address,
+                value: readyStore.value,
+                ticksLeft: currentState.cyclesPerInstruction.storing,
+            }
+        })
+    }
+
     let addSubFuncUnits = currentState.addSubtractFunctionUnits.map(dec)
     let mulDivFuncUnits = currentState.multiplyDivideFunctionUnits.map(dec)
     let functionUnitTransmit = false
@@ -221,6 +382,8 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
             ...currentState,
             reservationStations: resStations,
             registerFile: regFile,
+            loadBuffers,
+            storeBuffers,
             addSubtractFunctionUnits: addSubFuncUnits,
             multiplyDivideFunctionUnits: mulDivFuncUnits,
             transmitFlags: transmitFlags,
@@ -299,11 +462,12 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
         }
     }
 
-
     return {
         ...currentState,
         reservationStations: resStations,
         registerFile: regFile,
+        loadBuffers,
+        storeBuffers,
         addSubtractFunctionUnits: addSubFuncUnits,
         multiplyDivideFunctionUnits: mulDivFuncUnits,
         transmitFlags: {

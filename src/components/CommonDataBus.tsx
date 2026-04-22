@@ -16,8 +16,8 @@ const DataBusLabel = ({ dataBus }: { dataBus: DataBus<number> }) => {
     }
     if (dataBus.source === 'load') {
         return (
-            <div>`f${dataBus.destinationRegister} = ${dataBus.value}`</div>
-        )
+            <div>{`LB${dataBus.sourceLoadBufferIndex} = ${dataBus.value}`}</div>
+        );
     }
 
     const isFromAdder = dataBus.sourceStation < adderReservationStationCount
