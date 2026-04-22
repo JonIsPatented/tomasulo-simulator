@@ -147,7 +147,7 @@ export const SettingsMenu = () => {
                 toAdjustDurations={(durations, value) => {
                   durations.storing = value
                 }}
-                durationNarrower={(durations) => durations.division}
+                durationNarrower={(durations) => durations.storing}
               />
             </Grid>
           </div>
