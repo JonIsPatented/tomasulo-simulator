@@ -170,6 +170,7 @@ export interface ActiveLoadSignalBus<T> {
   value: T
   source: 'load'
   destinationRegister: number
+  sourceLoadBufferIndex: number
 }
 
 export interface ActiveOperationSignalBus<T> {
