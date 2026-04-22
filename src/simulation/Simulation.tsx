@@ -52,7 +52,7 @@ export interface StationWaitingArgument {
 export interface LoadWaitingArgument {
   isReady: false
   waitingFor: 'load'
-  registerIndex: number
+  source: SourceReference
 }
 
 export type WaitingArgument =
@@ -100,6 +100,7 @@ export interface AddressWaitingStoreBuffer<T> {
   isReady: false;
   waitingFor: "address";
   addressSource: SourceReference;
+  offset: number;
   value: T;
 }
 
@@ -119,6 +120,7 @@ export interface BothWaitingStoreBuffer {
   waitingFor: "both";
   addressSource: SourceReference;
   valueSource: SourceReference;
+  offset: number;
 }
 
 export type WaitingStoreBuffer<T> =
@@ -144,6 +146,7 @@ export interface WaitingLoadBuffer {
   isLoading: false;
   isReady: false;
   waitingFor: SourceReference;
+  offset: number;
 }
 
 export interface ReadyLoadBuffer {

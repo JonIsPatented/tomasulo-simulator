@@ -29,7 +29,7 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
                 isEmpty: false,
                 isReady: true,
                 isLoading: false,
-                address: bus.value,
+                address: bus.value + buffer.offset,
                 ticksLeft: 0,
             }
         })
@@ -44,7 +44,7 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
                     isEmpty: false,
                     isReady: true,
                     isStoring: false,
-                    address: bus.value,
+                    address: bus.value + buffer.offset,
                     value: buffer.value,
                     ticksLeft: 0,
                 }
@@ -69,17 +69,6 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
 
                 if (!addressReady && !valueReady) return buffer
 
-                if (addressReady && valueReady) {
-                    return{
-                        isEmpty: false,
-                        isReady: true,
-                        isStoring: false,
-                        address: bus.value,
-                        value: bus.value,
-                        ticksLeft: 0,
-                    }
-                }
-
                 if (addressReady) {
                     return{
                         isEmpty: false,
@@ -87,7 +76,7 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
                         isStoring: false,
                         waitingFor: "value",
                         valueSource: buffer.valueSource,
-                        address: bus.value,
+                        address: bus.value + buffer.offset,
                     }
                 }
 
@@ -97,6 +86,7 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
                     isStoring: false,
                     waitingFor: "address",
                     addressSource: buffer.addressSource,
+                    offset: buffer.offset,
                     value: bus.value,
                 }
             }
@@ -206,29 +196,31 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
                 commonDataBusToReservationStations: true,
             }
             resStations = resStations.map((station) => {
-                const firstFromRegister =
+                const firstFromLoad  =
                     !station.isEmpty &&
                     !station.isReady &&
                     !station.firstArgument.isReady &&
                     station.firstArgument.waitingFor === 'load' &&
-                    station.firstArgument.registerIndex === bus.destinationRegister
+                    station.firstArgument.source.source === "loadBuffer" &&
+                    station.firstArgument.source.index === bus.sourceLoadBufferIndex
 
-                const secondFromRegister =
+                const secondFromLoad =
                     !station.isEmpty &&
                     !station.isReady &&
                     !station.secondArgument.isReady &&
                     station.secondArgument.waitingFor === 'load' &&
-                    station.secondArgument.registerIndex === bus.destinationRegister
+                    station.secondArgument.source.source === "loadBuffer" &&
+                    station.secondArgument.source.index === bus.sourceLoadBufferIndex
 
-                if (firstFromRegister || secondFromRegister)
+                if (firstFromLoad  || secondFromLoad)
                     transmitFlags = {
                         ...transmitFlags,
                         commonDataBusToReservationStations: true,
                     }
 
-                return !firstFromRegister && !secondFromRegister ? {
+                return !firstFromLoad  && !secondFromLoad ? {
                     ...station,
-                } : firstFromRegister && station.secondArgument.isReady ? {
+                } : firstFromLoad  && station.secondArgument.isReady ? {
                     isReady: true,
                     isEmpty: false,
                     isExecuting: false,
@@ -242,14 +234,14 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
                     operation: station.operation,
                     firstArgument: station.firstArgument.value,
                     secondArgument: bus.value,
-                } : firstFromRegister && secondFromRegister ? {
+                } : firstFromLoad  && secondFromLoad ? {
                     isReady: true,
                     isEmpty: false,
                     isExecuting: false,
                     operation: station.operation,
                     firstArgument: bus.value,
                     secondArgument: bus.value,
-                } : firstFromRegister ? {
+                } : firstFromLoad  ? {
                     isReady: false,
                     isEmpty: false,
                     isExecuting: false,
@@ -276,7 +268,7 @@ export const dispatchStep: (currentState: SimulatorData) => SimulatorData = (cur
                 }
             })
             regFile = regFile.map((register, i) => {
-                if (bus.source === 'load' && i === bus.destinationRegister) {
+                if (bus.source === 'load' && !register.hasValue && register.alias.source === "loadBuffer" && register.alias.index === bus.sourceLoadBufferIndex) {
                     return {
                         hasValue: true,
                         value: bus.value,

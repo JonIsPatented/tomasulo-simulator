@@ -1,3 +1,4 @@
+import { InstructionQueue } from "../components/InstructionQueue"
 import type { SimulatorData, Instruction, SourceReference} from "./Simulation"
 
 export const issueStep = (currentState: SimulatorData): SimulatorData => {
@@ -49,7 +50,7 @@ export const issueStep = (currentState: SimulatorData): SimulatorData => {
         const getOperand = (regIndex: number): {
             value?: number,
             station?: number,
-            waitingRegister?: number,
+            waitingLoadSource?: SourceReference,
         } => {
             const reg = regFile[regIndex]
 
@@ -61,8 +62,8 @@ export const issueStep = (currentState: SimulatorData): SimulatorData => {
                 }
 
                 return {
-                    waitingRegister: regIndex
-                }
+                    waitingLoadSource: reg.alias,
+                };
             }
 
             newTransmitFlags = {
@@ -103,7 +104,7 @@ export const issueStep = (currentState: SimulatorData): SimulatorData => {
             } : {
                 isReady: false,
                 waitingFor: 'load',
-                registerIndex: op1.waitingRegister!,
+                source: op1.waitingLoadSource!,
             },
             secondArgument: op2.station !== undefined ? {
                 isReady: false,
@@ -112,7 +113,7 @@ export const issueStep = (currentState: SimulatorData): SimulatorData => {
             } : {
                 isReady: false,
                 waitingFor: 'load',
-                registerIndex: op2.waitingRegister!,
+                source: op2.waitingLoadSource!,
             }
         } : onlyFirstReady ? {
             isEmpty: false,
@@ -130,7 +131,7 @@ export const issueStep = (currentState: SimulatorData): SimulatorData => {
             } : {
                 isReady: false,
                 waitingFor: 'load',
-                registerIndex: op2.waitingRegister!,
+                source: op2.waitingLoadSource!,
             }
         } : { // onlySecondReady
             isEmpty: false,
@@ -144,7 +145,7 @@ export const issueStep = (currentState: SimulatorData): SimulatorData => {
             } : {
                 isReady: false,
                 waitingFor: 'load',
-                registerIndex: op1.waitingRegister!,
+                source: op1.waitingLoadSource!,
             },
             secondArgument: {
                 isReady: true,
@@ -201,13 +202,14 @@ export const issueStep = (currentState: SimulatorData): SimulatorData => {
                 isLoading: false,
                 isReady: true,
                 address: baseOperand.value + instruction.offset,
-                ticksLeft: currentState.cyclesPerInstruction.loading,
+                ticksLeft: 0,
             }
             : {
                 isEmpty: false,
                 isLoading: false,
                 isReady: false,
                 waitingFor: baseOperand.source!,
+                offset: instruction.offset,
             }
 
             regFile[instruction.register] = {
@@ -249,7 +251,7 @@ export const issueStep = (currentState: SimulatorData): SimulatorData => {
                     isReady: true,
                     address: baseOperand.value! + instruction.offset,
                     value: valueOperand.value!,
-                    ticksLeft: currentState.cyclesPerInstruction.storing,
+                    ticksLeft: 0,
                 }
                 : !addressReady && valueReady
                     ? {
@@ -258,6 +260,7 @@ export const issueStep = (currentState: SimulatorData): SimulatorData => {
                         isReady: false,
                         waitingFor: "address",
                         addressSource: baseOperand.source!,
+                        offset: instruction.offset,
                         value: valueOperand.value!,
                     }
                     : addressReady && !valueReady
@@ -276,6 +279,7 @@ export const issueStep = (currentState: SimulatorData): SimulatorData => {
                             waitingFor: "both",
                             addressSource: baseOperand.source!,
                             valueSource: valueOperand.source!,
+                            offset: instruction.offset,
                         }
             return {
                 ...currentState,
