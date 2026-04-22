@@ -1,4 +1,3 @@
-import { InstructionQueue } from "../components/InstructionQueue"
 import type { SimulatorData, Instruction, SourceReference} from "./Simulation"
 
 export const issueStep = (currentState: SimulatorData): SimulatorData => {
@@ -9,6 +8,14 @@ export const issueStep = (currentState: SimulatorData): SimulatorData => {
     }
 
     const instruction: Instruction = queue[0]
+    
+    const newInstructionHistory = [
+        ...currentState.instructionHistory,
+        {
+            instruction,
+            start: currentState.currentTick,
+        },
+    ]
 
     if (instruction.type === "arithmetic") {
         let resStations = [...currentState.reservationStations]
@@ -168,6 +175,7 @@ export const issueStep = (currentState: SimulatorData): SimulatorData => {
             registerFile: regFile,
             instructionQueue: queue.slice(1),
             transmitFlags: newTransmitFlags,
+            instructionHistory: newInstructionHistory,
         }
     }
 
@@ -228,7 +236,8 @@ export const issueStep = (currentState: SimulatorData): SimulatorData => {
                 transmitFlags: {
                     ...currentState.transmitFlags,
                     instructionQueueToReservationStations: true,
-                }
+                },
+                instructionHistory: newInstructionHistory,
             }
         }
 
@@ -288,7 +297,8 @@ export const issueStep = (currentState: SimulatorData): SimulatorData => {
                 transmitFlags: {
                     ...currentState.transmitFlags,
                     instructionQueueToReservationStations: true,
-                }
+                },
+                instructionHistory: newInstructionHistory,
             }
         }
     }

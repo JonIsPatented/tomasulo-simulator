@@ -338,6 +338,18 @@ export interface SimulatorData {
   // A flag to indicate whether a simulation has begun
   // since the last reset
   running: boolean
+
+  // The count of the most recently executed clock cycle
+  currentTick: number
+
+  // List of instructions that have been issued
+  // The "start" time is the tick on which it was issued
+  // The "end" time is the tick on which is was broadcast
+  instructionHistory: Array<{
+    instruction: Instruction
+    start: number
+    end?: number
+  }>
 }
 
 export class Simulation {
@@ -491,6 +503,7 @@ export class Simulation {
     this.currentState = [this.currentState]
       .map(setRunning)
       .map(resetTransmitFlags)
+      .map(incrementCurrentTick)
       .map(issueStep)
       .map(dispatchStep)
       .map(broadcastStep)[0]
@@ -559,6 +572,13 @@ const resetTransmitFlags = (data: SimulatorData): SimulatorData => {
       storeBuffersToMemoryUnit: false,
       memoryUnitToLoadBuffers: false,
     },
+  }
+}
+
+const incrementCurrentTick = (data: SimulatorData): SimulatorData => {
+  return {
+    ...data,
+    currentTick: data.currentTick + 1,
   }
 }
 
@@ -679,4 +699,6 @@ const defaultState = (): SimulatorData => ({
     storing: 4,
   },
   running: false,
+  currentTick: 0,
+  instructionHistory: [],
 })
