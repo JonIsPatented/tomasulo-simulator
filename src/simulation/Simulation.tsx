@@ -300,7 +300,7 @@ export interface SimulatorData {
   // most recent clock cycle
   transmitFlags: {
     registerFileToReservationStations: boolean
-    loadStoreBuffersToReservationStations: boolean
+    loadBuffersToCommonDataBus: boolean
     reservationStationsToFunctionUnits: boolean
     instructionQueueToReservationStations: boolean
     functionUnitsToCommonDataBus: boolean
@@ -542,7 +542,7 @@ const resetTransmitFlags = (data: SimulatorData): SimulatorData => {
     ...data,
     transmitFlags: {
       registerFileToReservationStations: false,
-      loadStoreBuffersToReservationStations: false,
+      loadBuffersToCommonDataBus: false,
       reservationStationsToFunctionUnits: false,
       instructionQueueToReservationStations: false,
       functionUnitsToCommonDataBus: false,
@@ -660,7 +660,7 @@ const defaultState = (): SimulatorData => ({
   instructionQueue: [],
   transmitFlags: {
     registerFileToReservationStations: false,
-    loadStoreBuffersToReservationStations: false,
+    loadBuffersToCommonDataBus: false,
     reservationStationsToFunctionUnits: false,
     instructionQueueToReservationStations: false,
     functionUnitsToCommonDataBus: false,
