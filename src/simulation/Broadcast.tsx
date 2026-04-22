@@ -7,20 +7,22 @@ import type { ArithmeticOpcode, SimulatorData, StoreBufferData, LoadBufferData} 
 // Computes the result for each type of operation
 // Currently does not support load / store
 const computeResult = (
-    operation: ArithmeticOpcode,
-    firstArgumentValue: number,
-    secondArgumentValue: number
+  operation: ArithmeticOpcode,
+  firstArgumentValue: number,
+  secondArgumentValue: number
 ): number => {
-    switch (operation) {
-        case 'add':
-            return firstArgumentValue + secondArgumentValue
-        case 'sub':
-            return firstArgumentValue - secondArgumentValue
-        case 'mul':
-            return firstArgumentValue * secondArgumentValue
-        case 'div':
-            return secondArgumentValue === 0 ? NaN : firstArgumentValue / secondArgumentValue
-    }
+  switch (operation) {
+    case 'add':
+      return firstArgumentValue + secondArgumentValue
+    case 'sub':
+      return firstArgumentValue - secondArgumentValue
+    case 'mul':
+      return firstArgumentValue * secondArgumentValue
+    case 'div':
+      return secondArgumentValue === 0
+        ? NaN
+        : firstArgumentValue / secondArgumentValue
+  }
 }
 
 export const broadcastStep = (currentState: SimulatorData): SimulatorData => {
@@ -168,11 +170,22 @@ export const broadcastStep = (currentState: SimulatorData): SimulatorData => {
             },
         }
     }
+  }
 
+  // Checks if the add / sub function unit is done
+  if (!addFunctionUnit.isEmpty && addFunctionUnit.ticksLeft === 0) {
     return {
         ...nextState,
         commonDataBus: {
             isActive: false
         }
     }
+  }
+
+  return {
+    ...currentState,
+    commonDataBus: {
+      isActive: false,
+    },
+  }
 }
