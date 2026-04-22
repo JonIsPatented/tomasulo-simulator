@@ -21,7 +21,7 @@ const BGroup = ({
                 <Text size="1" weight="bold" color="gray">name</Text>
                 <Text size="1" weight="bold" color="gray">value</Text>
                 {buffers.map((b, i) => (
-                    <BRow key={start + 1} b={b} index={start + i} />
+                    <BRow key={start + i} b={b} index={start + i} />
                 ))}
             </Grid>
         </Flex>

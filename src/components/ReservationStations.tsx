@@ -47,8 +47,10 @@ const RSRow = ({
             return argument.value.toString()
         if (!argument.isReady && argument.waitingFor == 'station')
             return `RS${argument.reservationStationIndex}`
-        if (!argument.isReady && argument.waitingFor == 'load')
-            return `f${argument.registerIndex}`
+        if (!argument.isReady && argument.waitingFor == "load")
+            return argument.source.source === "loadBuffer"
+            ? `LB${argument.source.index}`
+            : `RS${argument.source.index}`;
         return '-'
     }
 

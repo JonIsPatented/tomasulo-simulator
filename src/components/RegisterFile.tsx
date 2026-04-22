@@ -43,32 +43,36 @@ export const RegisterFile = () => {
           <>
             <Text
               key={`name-${i}`}
-              weight='medium'
-              color={isWaiting ? 'gray' : undefined}
-              className='border-b border-gray-100 py-1 whitespace-nowrap'
+              weight="medium"
+              color={isWaiting ? "gray" : undefined}
+              className="border-b border-gray-100 py-1 whitespace-nowrap"
             >
               f{i}
             </Text>
 
             <TextField.Root
               key={`val-${i}`}
-              size='1'
-              value={reg.hasValue ? reg.value : '-'}
+              size="1"
+              value={reg.hasValue ? reg.value : "-"}
               readOnly
-              className='text-center'
+              className="text-center"
             />
 
             <Text
               key={`tag-${i}`}
-              align='center'
-              size='1'
-              color={isWaiting ? 'gray' : undefined}
-              className='border-b border-gray-100 py-1 whitespace-nowrap'
+              align="center"
+              size="1"
+              color={isWaiting ? "gray" : undefined}
+              className="border-b border-gray-100 py-1 whitespace-nowrap"
             >
-              {!reg.hasValue ? `RS${reg.alias}` : '-'}
+              {!reg.hasValue
+                ? reg.alias.source === "reservationStation"
+                  ? `RS${reg.alias.index}`
+                  : `LB${reg.alias.index}`
+                : "-"}
             </Text>
           </>
-        )
+        );
       })}
     </Grid>
   )
