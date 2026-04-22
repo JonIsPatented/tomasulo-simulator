@@ -3,6 +3,7 @@ import {
   formatInstruction,
   type Instruction,
 } from '../simulation/Simulation'
+import { useSimulation } from '../hooks/useSimulation'
 
 interface InstructionEntryProps {
   instruction: Instruction
@@ -48,6 +49,7 @@ const InstructionEntry = ({
 }
 
 export const InstructionHistory = () => {
+  const history = useSimulation((data) => data.instructionHistory)
   return (
     <Grid
       columns='1fr auto auto'
@@ -81,16 +83,13 @@ export const InstructionHistory = () => {
       </Text>
 
       {/* Instruction Entries */}
-      <InstructionEntry
-        instruction={{
-          type: 'arithmetic',
-          opcode: 'add',
-          destination: 1,
-          source1: 2,
-          source2: 3,
-        }}
-        start={4}
-      />
+      {history.map((entry) => (
+        <InstructionEntry
+          instruction={entry.instruction}
+          start={entry.start}
+          done={entry.end}
+        />
+      ))}
     </Grid>
   )
 }
