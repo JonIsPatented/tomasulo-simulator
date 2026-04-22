@@ -94,7 +94,7 @@ export interface AddressWaitingStoreBuffer<T> {
   isStoring: false
   isReady: false
   waitingFor: 'address'
-  waitingStaionIndex: number
+  waitingStationIndex: number
   value: T
 }
 
