@@ -10,9 +10,13 @@ export interface ValueRegister<T> {
   value: T
 }
 
+export type SourceReference =
+  | { source: "reservationStation"; index: number }
+  | { source: "loadBuffer"; index: number }
+
 export interface AliasRegister {
-  hasValue: false
-  alias: number
+  hasValue: false;
+  alias: SourceReference
 }
 
 export type RegisterData<T> = ValueRegister<T> | AliasRegister
@@ -87,29 +91,40 @@ export interface ReadyStoreBuffer<T> {
   isReady: true
   address: number
   value: T
+  ticksLeft: number
 }
 
 export interface AddressWaitingStoreBuffer<T> {
-  isEmpty: false
-  isStoring: false
-  isReady: false
-  waitingFor: 'address'
-  waitingStaionIndex: number
-  value: T
+  isEmpty: false;
+  isStoring: false;
+  isReady: false;
+  waitingFor: "address";
+  addressSource: SourceReference;
+  value: T;
 }
 
 export interface ValueWaitingStoreBuffer {
-  isEmpty: false
-  isStoring: false
-  isReady: false
-  waitingFor: 'value'
-  waitingStationIndex: number
-  address: number
+  isEmpty: false;
+  isStoring: false;
+  isReady: false;
+  waitingFor: "value";
+  valueSource: SourceReference;
+  address: number;
+}
+
+export interface BothWaitingStoreBuffer {
+  isEmpty: false;
+  isStoring: false;
+  isReady: false;
+  waitingFor: "both";
+  addressSource: SourceReference;
+  valueSource: SourceReference;
 }
 
 export type WaitingStoreBuffer<T> =
   | AddressWaitingStoreBuffer<T>
   | ValueWaitingStoreBuffer
+  | BothWaitingStoreBuffer;
 
 export type StoreBufferData<T> =
   | ReadyStoreBuffer<T>
@@ -125,10 +140,10 @@ export interface EmptyLoadBuffer {
 }
 
 export interface WaitingLoadBuffer {
-  isEmpty: false
-  isLoading: false
-  isReady: false
-  waitingStationIndex: number
+  isEmpty: false;
+  isLoading: false;
+  isReady: false;
+  waitingFor: SourceReference;
 }
 
 export interface ReadyLoadBuffer {
@@ -136,6 +151,7 @@ export interface ReadyLoadBuffer {
   isLoading: boolean
   isReady: true
   address: number
+  ticksLeft: number
 }
 
 export type LoadBufferData =
