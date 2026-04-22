@@ -6,7 +6,7 @@ import { NumberInput } from './NumberInput'
 
 export const TitleBar = () => {
   const clockRate = useSimulation((data) => data.clockRate)
-
+  const currentTick = useSimulation((data) => data.currentTick)
   return (
     <Grid columns='3'>
       <Flex
@@ -26,6 +26,8 @@ export const TitleBar = () => {
         align='center'
         justify='end'
       >
+        <Text>{currentTick}</Text>
+
         <Button
           onClick={Simulation.getSimulation().step}
           variant='outline'

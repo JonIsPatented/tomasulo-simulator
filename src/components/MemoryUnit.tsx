@@ -75,7 +75,7 @@ export const MemoryUnit = () => {
             weight='medium'
             className='border-b border-gray-100 py-1 whitespace-nowrap'
           >
-            {`0x${address
+            {`0x${(4 * address)
               .toString(16)
               .padStart(8, '0')
               .toUpperCase()}`}

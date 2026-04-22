@@ -11,11 +11,11 @@ export interface ValueRegister<T> {
 }
 
 export type SourceReference =
-  | { source: "reservationStation"; index: number }
-  | { source: "loadBuffer"; index: number }
+  | { source: 'reservationStation'; index: number }
+  | { source: 'loadBuffer'; index: number }
 
 export interface AliasRegister {
-  hasValue: false;
+  hasValue: false
   alias: SourceReference
 }
 
@@ -95,38 +95,38 @@ export interface ReadyStoreBuffer<T> {
 }
 
 export interface AddressWaitingStoreBuffer<T> {
-  isEmpty: false;
-  isStoring: false;
-  isReady: false;
-  waitingFor: "address";
-  addressSource: SourceReference;
-  offset: number;
-  value: T;
+  isEmpty: false
+  isStoring: false
+  isReady: false
+  waitingFor: 'address'
+  addressSource: SourceReference
+  offset: number
+  value: T
 }
 
 export interface ValueWaitingStoreBuffer {
-  isEmpty: false;
-  isStoring: false;
-  isReady: false;
-  waitingFor: "value";
-  valueSource: SourceReference;
-  address: number;
+  isEmpty: false
+  isStoring: false
+  isReady: false
+  waitingFor: 'value'
+  valueSource: SourceReference
+  address: number
 }
 
 export interface BothWaitingStoreBuffer {
-  isEmpty: false;
-  isStoring: false;
-  isReady: false;
-  waitingFor: "both";
-  addressSource: SourceReference;
-  valueSource: SourceReference;
-  offset: number;
+  isEmpty: false
+  isStoring: false
+  isReady: false
+  waitingFor: 'both'
+  addressSource: SourceReference
+  valueSource: SourceReference
+  offset: number
 }
 
 export type WaitingStoreBuffer<T> =
   | AddressWaitingStoreBuffer<T>
   | ValueWaitingStoreBuffer
-  | BothWaitingStoreBuffer;
+  | BothWaitingStoreBuffer
 
 export type StoreBufferData<T> =
   | ReadyStoreBuffer<T>
@@ -142,11 +142,11 @@ export interface EmptyLoadBuffer {
 }
 
 export interface WaitingLoadBuffer {
-  isEmpty: false;
-  isLoading: false;
-  isReady: false;
-  waitingFor: SourceReference;
-  offset: number;
+  isEmpty: false
+  isLoading: false
+  isReady: false
+  waitingFor: SourceReference
+  offset: number
 }
 
 export interface ReadyLoadBuffer {
@@ -410,11 +410,11 @@ export class Simulation {
     ],
     instructionQueue: [
       {
-        type: 'arithmetic',
-        opcode: 'mul',
-        source1: 0,
-        source2: 1,
-        destination: 0,
+        type: 'memory',
+        opcode: 'st',
+        register: 0,
+        baseRegister: 3,
+        offset: 2,
       },
       {
         type: 'arithmetic',
@@ -425,17 +425,17 @@ export class Simulation {
       },
       {
         type: 'arithmetic',
-        opcode: 'sub',
+        opcode: 'mul',
         source1: 1,
         source2: 2,
-        destination: 2,
+        destination: 1,
       },
       {
-        type: 'arithmetic',
-        opcode: 'div',
-        source1: 0,
-        source2: 1,
-        destination: 3,
+        type: 'memory',
+        opcode: 'ld',
+        register: 2,
+        baseRegister: 3,
+        offset: 2,
       },
     ],
   }
