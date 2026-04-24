@@ -112,7 +112,7 @@ export const MainDiagram = () => {
       ref={containerRef}
       className='relative h-full p-4'
     >
-      <div className='grid auto-rows-auto grid-cols-12 gap-8'>
+      <div className='grid auto-rows-auto grid-cols-12 gap-x-8 gap-y-10'>
         {/* Controls */}
         <div className='col-span-12'>
           <TitleBar />
@@ -146,7 +146,7 @@ export const MainDiagram = () => {
         </div>
 
         {/* Register File */}
-        <div className='col-span-3 row-start-3'>
+        <div className='col-span-3 row-span-2 row-start-3'>
           <Section
             ref={registerFileRef}
             title='Register File'
@@ -166,7 +166,7 @@ export const MainDiagram = () => {
         </div>
 
         {/* Load / Store Buffers */}
-        <div className='col-span-3'>
+        <div className='col-span-3 row-span-2'>
           <Section
             ref={loadStoreBuffersRef}
             title='Load / Store Buffers'

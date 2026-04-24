@@ -320,9 +320,11 @@ export interface SimulatorData {
   // most recent clock cycle
   transmitFlags: {
     registerFileToReservationStations: boolean
+    registerFileToLoadStoreBuffers: boolean
     loadBuffersToCommonDataBus: boolean
     reservationStationsToFunctionUnits: boolean
     instructionQueueToReservationStations: boolean
+    instructionQueueToLoadStoreBuffers: boolean
     functionUnitsToCommonDataBus: boolean
     commonDataBusToRegisterFile: boolean
     commonDataBusToLoadStoreUnits: boolean
@@ -405,6 +407,10 @@ export class Simulation {
     registerFile: [
       { hasValue: true, value: 1.2 },
       { hasValue: true, value: 4.4 },
+      { hasValue: true, value: 0 },
+      { hasValue: true, value: 0 },
+      { hasValue: true, value: 0 },
+      { hasValue: true, value: 0 },
       { hasValue: true, value: 0 },
       { hasValue: true, value: 0 },
     ],
@@ -562,9 +568,11 @@ const resetTransmitFlags = (data: SimulatorData): SimulatorData => {
     ...data,
     transmitFlags: {
       registerFileToReservationStations: false,
+      registerFileToLoadStoreBuffers: false,
       loadBuffersToCommonDataBus: false,
       reservationStationsToFunctionUnits: false,
       instructionQueueToReservationStations: false,
+      instructionQueueToLoadStoreBuffers: false,
       functionUnitsToCommonDataBus: false,
       commonDataBusToRegisterFile: false,
       commonDataBusToLoadStoreUnits: false,
@@ -584,6 +592,10 @@ const incrementCurrentTick = (data: SimulatorData): SimulatorData => {
 
 const defaultState = (): SimulatorData => ({
   registerFile: [
+    { hasValue: true, value: 0 },
+    { hasValue: true, value: 0 },
+    { hasValue: true, value: 0 },
+    { hasValue: true, value: 0 },
     { hasValue: true, value: 0 },
     { hasValue: true, value: 0 },
     { hasValue: true, value: 0 },
@@ -637,8 +649,48 @@ const defaultState = (): SimulatorData => ({
       isReady: false,
       isLoading: false,
     },
+    {
+      isEmpty: true,
+      isReady: false,
+      isLoading: false,
+    },
+    {
+      isEmpty: true,
+      isReady: false,
+      isLoading: false,
+    },
+    {
+      isEmpty: true,
+      isReady: false,
+      isLoading: false,
+    },
+    {
+      isEmpty: true,
+      isReady: false,
+      isLoading: false,
+    },
   ],
   storeBuffers: [
+    {
+      isEmpty: true,
+      isReady: false,
+      isStoring: false,
+    },
+    {
+      isEmpty: true,
+      isReady: false,
+      isStoring: false,
+    },
+    {
+      isEmpty: true,
+      isReady: false,
+      isStoring: false,
+    },
+    {
+      isEmpty: true,
+      isReady: false,
+      isStoring: false,
+    },
     {
       isEmpty: true,
       isReady: false,
@@ -680,9 +732,11 @@ const defaultState = (): SimulatorData => ({
   instructionQueue: [],
   transmitFlags: {
     registerFileToReservationStations: false,
+    registerFileToLoadStoreBuffers: false,
     loadBuffersToCommonDataBus: false,
     reservationStationsToFunctionUnits: false,
     instructionQueueToReservationStations: false,
+    instructionQueueToLoadStoreBuffers: false,
     functionUnitsToCommonDataBus: false,
     commonDataBusToRegisterFile: false,
     commonDataBusToLoadStoreUnits: false,

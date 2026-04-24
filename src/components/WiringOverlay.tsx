@@ -90,6 +90,7 @@ export const WiringOverlay = ({
       </defs>
 
       <Wire
+        type='simple'
         from={right(registerFile)}
         to={left(reservationStations)}
         orthogonalDirection='horizontal'
@@ -97,6 +98,25 @@ export const WiringOverlay = ({
       />
 
       <Wire
+        type='simple'
+        from={{
+          ...right(registerFile),
+          y:
+            (top(functionUnits).y + bottom(reservationStations).y) /
+            2,
+        }}
+        to={{
+          ...left(loadStoreBuffers),
+          y:
+            (top(functionUnits).y + bottom(reservationStations).y) /
+            2,
+        }}
+        orthogonalDirection='horizontal'
+        active={transmitFlags.registerFileToLoadStoreBuffers}
+      />
+
+      <Wire
+        type='simple'
         from={{
           ...bottom(loadStoreBuffers),
           x:
@@ -114,6 +134,7 @@ export const WiringOverlay = ({
       />
 
       <Wire
+        type='simple'
         from={bottom(reservationStations)}
         to={top(functionUnits)}
         orthogonalDirection='vertical'
@@ -121,6 +142,7 @@ export const WiringOverlay = ({
       />
 
       <Wire
+        type='simple'
         from={bottom(instructionQueue)}
         to={top(reservationStations)}
         orthogonalDirection='vertical'
@@ -128,6 +150,33 @@ export const WiringOverlay = ({
       />
 
       <Wire
+        type='path'
+        path={[
+          {
+            ...bottom(instructionQueue),
+            x:
+              (bottom(instructionQueue).x +
+                right(instructionQueue).x) /
+              2,
+          },
+          {
+            x:
+              (bottom(instructionQueue).x +
+                right(instructionQueue).x) /
+              2,
+            y: (bottom(memoryUnit).y + top(loadStoreBuffers).y) / 2,
+          },
+          {
+            ...top(loadStoreBuffers),
+            y: (bottom(memoryUnit).y + top(loadStoreBuffers).y) / 2,
+          },
+          top(loadStoreBuffers),
+        ]}
+        active={transmitFlags.instructionQueueToLoadStoreBuffers}
+      />
+
+      <Wire
+        type='simple'
         from={bottom(functionUnits)}
         to={top(commonDataBus)}
         orthogonalDirection='vertical'
@@ -135,6 +184,7 @@ export const WiringOverlay = ({
       />
 
       <Wire
+        type='simple'
         from={{
           ...top(commonDataBus),
           x: bottom(registerFile).x,
@@ -145,6 +195,7 @@ export const WiringOverlay = ({
       />
 
       <Wire
+        type='simple'
         from={{
           ...top(commonDataBus),
           x: bottom(loadStoreBuffers).x,
@@ -155,6 +206,7 @@ export const WiringOverlay = ({
       />
 
       <Wire
+        type='simple'
         from={{
           ...top(commonDataBus),
           x:
@@ -170,6 +222,7 @@ export const WiringOverlay = ({
       />
 
       <Wire
+        type='simple'
         from={{
           ...top(loadStoreBuffers),
           x:
@@ -185,6 +238,7 @@ export const WiringOverlay = ({
       />
 
       <Wire
+        type='simple'
         from={{
           ...bottom(memoryUnit),
           x: (left(loadStoreBuffers).x + top(loadStoreBuffers).x) / 2,
@@ -200,26 +254,85 @@ export const WiringOverlay = ({
   )
 }
 
-const Wire = ({
-  from,
-  to,
-  orthogonalDirection,
-  active = false,
-  thickness = 2,
-}: {
+interface SimpleWireProps {
+  type: 'simple'
   from: { x: number; y: number }
   to: { x: number; y: number }
   orthogonalDirection?: 'horizontal' | 'vertical'
   active?: boolean
   thickness?: number
-}) => {
-  if (!orthogonalDirection) {
+}
+
+interface PathWireProps {
+  type: 'path'
+  path: Array<{ x: number; y: number }>
+  active?: boolean
+  thickness?: number
+}
+
+type WireProps = SimpleWireProps | PathWireProps
+
+const Wire = (props: WireProps) => {
+  if (props.type === 'simple') {
+    const {
+      from,
+      to,
+      orthogonalDirection,
+      active = false,
+      thickness = 2,
+    } = props
+
+    if (!orthogonalDirection) {
+      return (
+        <line
+          x1={from.x}
+          y1={from.y}
+          x2={to.x}
+          y2={to.y}
+          stroke={active ? '#ff637e' : '#888'}
+          strokeWidth={thickness}
+          strokeLinecap='round'
+          markerEnd={
+            active ? 'url(#arrowhead-active)' : 'url(#arrowhead)'
+          }
+        />
+      )
+    }
+
+    let adjustedFrom = from
+    let adjustedTo = to
+
+    const deltaX = adjustedTo.x - adjustedFrom.x
+    const deltaY = adjustedTo.y - adjustedFrom.y
+
+    switch (orthogonalDirection) {
+      case 'horizontal':
+        adjustedFrom = {
+          ...from,
+          y: from.y + deltaY / 2,
+        }
+        adjustedTo = {
+          ...to,
+          y: to.y - deltaY / 2,
+        }
+        break
+      case 'vertical':
+        adjustedFrom = {
+          ...from,
+          x: from.x + deltaX / 2,
+        }
+        adjustedTo = {
+          ...to,
+          x: to.x - deltaX / 2,
+        }
+    }
+
     return (
       <line
-        x1={from.x}
-        y1={from.y}
-        x2={to.x}
-        y2={to.y}
+        x1={adjustedFrom.x}
+        y1={adjustedFrom.y}
+        x2={adjustedTo.x}
+        y2={adjustedTo.y}
         stroke={active ? '#ff637e' : '#888'}
         strokeWidth={thickness}
         strokeLinecap='round'
@@ -230,46 +343,35 @@ const Wire = ({
     )
   }
 
-  let adjustedFrom = from
-  let adjustedTo = to
-
-  const deltaX = adjustedTo.x - adjustedFrom.x
-  const deltaY = adjustedTo.y - adjustedFrom.y
-
-  switch (orthogonalDirection) {
-    case 'horizontal':
-      adjustedFrom = {
-        ...from,
-        y: from.y + deltaY / 2,
-      }
-      adjustedTo = {
-        ...to,
-        y: to.y - deltaY / 2,
-      }
-      break
-    case 'vertical':
-      adjustedFrom = {
-        ...from,
-        x: from.x + deltaX / 2,
-      }
-      adjustedTo = {
-        ...to,
-        x: to.x - deltaX / 2,
-      }
-  }
+  const { path, active = false, thickness = 2 } = props
 
   return (
-    <line
-      x1={adjustedFrom.x}
-      y1={adjustedFrom.y}
-      x2={adjustedTo.x}
-      y2={adjustedTo.y}
-      stroke={active ? '#ff637e' : '#888'}
-      strokeWidth={thickness}
-      strokeLinecap='round'
-      markerEnd={
-        active ? 'url(#arrowhead-active)' : 'url(#arrowhead)'
-      }
-    />
+    <>
+      {Array.from({ length: path.length - 1 }, (_, i) => i).map(
+        (i) => {
+          const from = path[i]
+          const to = path[i + 1]
+
+          return (
+            <line
+              x1={from.x}
+              y1={from.y}
+              x2={to.x}
+              y2={to.y}
+              stroke={active ? '#ff637e' : '#888'}
+              strokeWidth={thickness}
+              strokeLinecap='round'
+              markerEnd={
+                i == path.length - 2
+                  ? active
+                    ? 'url(#arrowhead-active)'
+                    : 'url(#arrowhead)'
+                  : undefined
+              }
+            />
+          )
+        }
+      )}
+    </>
   )
 }
