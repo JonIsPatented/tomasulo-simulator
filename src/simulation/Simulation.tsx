@@ -514,6 +514,17 @@ export class Simulation {
     this.publish()
   }
 
+  // reset
+  public readonly reset = () => {
+    this.stopClock()
+    this.currentState = {
+      ...defaultState(),
+      clockRate: this.currentState.clockRate,
+      cyclesPerInstruction: this.currentState.cyclesPerInstruction,
+    }
+    this.publish()
+  }
+
   // Assembles a raw program stirng and loads it into the simulator
   // Resets the state of the simulator while preserving user settings
   // Returns a result indicating if the program failed to assemble
