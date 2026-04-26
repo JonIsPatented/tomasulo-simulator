@@ -12,8 +12,15 @@ export const TitleBar = () => {
       <Flex
         justify='start'
         align='center'
+        gap='2'
       >
         <SettingsMenu />
+        <Button
+          variant='outline'
+          onClick={Simulation.getSimulation().reset}
+        >
+          Reset
+        </Button>
       </Flex>
       <Flex
         align='center'
