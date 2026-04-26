@@ -440,6 +440,8 @@ export class Simulation {
     ],
   }
 
+  private initialState: SimulatorData = this.currentState
+
   public readonly getSimulatorData = (): SimulatorData => {
     return this.currentState
   }
@@ -518,12 +520,12 @@ export class Simulation {
   public readonly reset = () => {
     this.stopClock()
     this.currentState = {
-      ...defaultState(),
-      clockRate: this.currentState.clockRate,
-      cyclesPerInstruction: this.currentState.cyclesPerInstruction,
+        ...this.initialState,
+        clockRate: this.currentState.clockRate,
+        cyclesPerInstruction: this.currentState.cyclesPerInstruction,
     }
     this.publish()
-  }
+}
 
   // Assembles a raw program stirng and loads it into the simulator
   // Resets the state of the simulator while preserving user settings
