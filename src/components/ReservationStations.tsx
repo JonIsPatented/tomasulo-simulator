@@ -83,13 +83,18 @@ const RSRow = ({
             <Text className="border-b border-gray-100 py-1">
                 {rs.isEmpty ? '-' : getValue(rs.secondArgument)}
             </Text>
-            <Text
-                color={color}
-                weight="medium"
-                className="border-b border-gray-100 py-1"
-            >
-                {status}
-            </Text>
+            <div className="border-b border-gray-100 py-1">
+                    <span className={`
+                        inline-flex items-center justify-center
+                        px-2 py-0.5 rounded-full text-xs font-medium
+                        ${status === 'Waiting' ? 'bg-amber-100 text-amber-700' : ''}
+                        ${status === 'Ready' ? 'bg-green-100 text-green-700' : ''}
+                        ${status === 'Running' ? 'bg-blue-100 text-blue-700' : ''}
+                        ${status === 'Free' ? 'bg-gray-100 text-gray-500' : ''}
+                    `}>
+                        {status}
+                    </span>
+            </div>
         </>
     )
 }
