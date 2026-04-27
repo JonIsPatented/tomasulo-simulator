@@ -51,12 +51,13 @@ const InstructionEntry = ({
 export const InstructionHistory = () => {
   const history = useSimulation((data) => data.instructionHistory)
   return (
-    <Grid
-      columns='1fr auto auto'
-      gapX='4'
-      gapY='2'
-      className='items-center text-sm'
-    >
+    <div className="max-h-48 overflow-y-auto">
+      <Grid
+        columns='1fr auto auto'
+        gapX='4'
+        gapY='2'
+        className='items-center text-sm'
+      >
       {/* Headers */}
       <Text
         size='1'
@@ -91,5 +92,6 @@ export const InstructionHistory = () => {
         />
       ))}
     </Grid>
+    </div>
   )
 }
